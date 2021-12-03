@@ -15,7 +15,6 @@
 #include <unordered_map>
 #include <numeric>
 
-void puzzle_14_1();
-void puzzle_14_2();
+void puzzle_01_1();
 
 #endif /* Puzzles_hpp */

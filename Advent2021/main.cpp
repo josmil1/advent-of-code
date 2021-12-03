@@ -7,10 +7,11 @@
 
 #include "Puzzles.hpp"
 
-int main(int argc, const char * argv[]) {
+int main(int argc, const char *argv[])
+{
     std::cout << "Merry Christmas!\n";
-    
-    puzzle_14_2();
-    
+
+    puzzle_01_1();
+
     return 0;
 }

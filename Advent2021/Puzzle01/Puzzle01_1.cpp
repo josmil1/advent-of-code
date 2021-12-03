@@ -71,9 +71,9 @@ namespace
     };
 }
 
-void puzzle_14_1()
+void puzzle_01_1()
 {
-    std::ifstream in_file("/Users/josmil17/Programming/advent21/Advent2021/Advent2021/Puzzle14/input.txt");
+    std::ifstream in_file("/Users/josmil17/Programming/advent21/Advent2021/Advent2021/Puzzle01/input.txt");
     if (!in_file)
     {
         std::cerr << "Cannot open file";
