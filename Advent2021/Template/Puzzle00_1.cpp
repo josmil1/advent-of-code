@@ -16,9 +16,9 @@
 //    uint64_t value = std::stol(value_str);
 //}
 
-void puzzle_01_1()
+void puzzle_00_1()
 {
-    std::ifstream in_file("/Users/josmil17/Programming/advent21/Advent2021/Advent2021/Puzzle01/input.txt");
+    std::ifstream in_file("/Users/josmil17/Programming/advent21/Advent2021/Advent2021/Puzzle00/input.txt");
     if (!in_file)
     {
         std::cerr << "Cannot open file";
