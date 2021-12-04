@@ -1,6 +1,6 @@
 #include "Puzzles.hpp"
 
-void puzzle_01_1()
+void puzzle_02_1()
 {
     std::ifstream in_file("/Users/josmil17/Programming/advent21/Advent2021/Advent2021/Puzzle01/input_0.txt");
     if (!in_file)

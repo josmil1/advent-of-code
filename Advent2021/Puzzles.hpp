@@ -16,5 +16,9 @@
 #include <numeric>
 
 void puzzle_01_1();
+void puzzle_01_2();
+
+void puzzle_02_1();
+void puzzle_02_2();
 
 #endif /* Puzzles_hpp */
