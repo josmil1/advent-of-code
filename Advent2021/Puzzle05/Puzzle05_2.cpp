@@ -32,40 +32,17 @@ void puzzle_05_2()
             //std::cout << "(" << x_1 << ", " << y_1 << ") -> (" << x_2 << ", " << y_2 << ")" << std::endl;
 
             // Increment counters in grid
-            if (x_1 == x_2 || y_1 == y_2)
+            // Assume parallel, or 45 degree angles only
+            while (x_1 != x_2 || y_1 != y_2)
             {
-                // Parallel lines
-                if (x_1 > x_2 || y_1 > y_2)
-                {
-                    // Reverse direction to simplify loop
-                    std::swap(x_1, x_2);
-                    std::swap(y_1, y_2);
-                }
-
-                for (uint32_t i = x_1; i <= x_2; i++)
-                {
-                    for (uint32_t j = y_1; j <= y_2; j++)
-                    {
-                        //std::cout << i << ", " << j << std::endl;
-                        auto floor_key = key(i, j);
-                        floor[floor_key]++;
-                    }
-                }
-            }
-            else
-            {
-                while (x_1 != x_2 && y_1 != y_2)
-                {
-
-                    //std::cout << x_1 << ", " << x_2 << std::endl;
-                    auto floor_key = key(x_1, y_1);
-                    floor[floor_key]++;
+                //std::cout << x_1 << ", " << x_2 << std::endl;
+                floor[key(x_1, y_1)]++;
+                if (y_1 != y_2)
                     y_1 = (y_1 < y_2) ? y_1 + 1 : y_1 - 1;
+                if (x_1 != x_2)
                     x_1 = (x_1 < x_2) ? x_1 + 1 : x_1 - 1;
-                }
-                auto floor_key = key(x_1, y_1);
-                floor[floor_key]++;
             }
+            floor[key(x_1, y_1)]++; // Include last point
         }
     }
 
