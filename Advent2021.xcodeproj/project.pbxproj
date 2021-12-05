@@ -20,6 +20,8 @@
 		36A08A9D275BCFA300F04541 /* Puzzle04_2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08A99275BCFA300F04541 /* Puzzle04_2.cpp */; };
 		36A08AA3275CC22000F04541 /* Puzzle05_1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08AA0275CC22000F04541 /* Puzzle05_1.cpp */; };
 		36A08AA4275CC22000F04541 /* Puzzle05_2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08AA1275CC22000F04541 /* Puzzle05_2.cpp */; };
+		36A08AAA275D7EEF00F04541 /* Puzzle06_1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08AA7275D7EEF00F04541 /* Puzzle06_1.cpp */; };
+		36A08AAB275D7EEF00F04541 /* Puzzle06_2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08AA8275D7EEF00F04541 /* Puzzle06_2.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -62,6 +64,10 @@
 		36A08AA0275CC22000F04541 /* Puzzle05_1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle05_1.cpp; sourceTree = "<group>"; };
 		36A08AA1275CC22000F04541 /* Puzzle05_2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle05_2.cpp; sourceTree = "<group>"; };
 		36A08AA2275CC22000F04541 /* input.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input.txt; sourceTree = "<group>"; };
+		36A08AA6275D7EEF00F04541 /* input_0.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_0.txt; sourceTree = "<group>"; };
+		36A08AA7275D7EEF00F04541 /* Puzzle06_1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle06_1.cpp; sourceTree = "<group>"; };
+		36A08AA8275D7EEF00F04541 /* Puzzle06_2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle06_2.cpp; sourceTree = "<group>"; };
+		36A08AA9275D7EEF00F04541 /* input.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,6 +117,7 @@
 				36A08A90275BA83B00F04541 /* Puzzle03 */,
 				36A08A97275BCFA300F04541 /* Puzzle04 */,
 				36A08A9E275CC22000F04541 /* Puzzle05 */,
+				36A08AA5275D7EEF00F04541 /* Puzzle06 */,
 				369F6AB62586FA6800699575 /* main.cpp */,
 				369F6ABF2586FB1D00699575 /* Puzzles.hpp */,
 			);
@@ -174,6 +181,18 @@
 			path = Puzzle05;
 			sourceTree = "<group>";
 		};
+		36A08AA5275D7EEF00F04541 /* Puzzle06 */ = {
+			isa = PBXGroup;
+			children = (
+				36A08AA6275D7EEF00F04541 /* input_0.txt */,
+				36A08AA7275D7EEF00F04541 /* Puzzle06_1.cpp */,
+				36A08AA8275D7EEF00F04541 /* Puzzle06_2.cpp */,
+				36A08AA9275D7EEF00F04541 /* input.txt */,
+			);
+			name = Puzzle06;
+			path = Advent2021/Puzzle06;
+			sourceTree = SOURCE_ROOT;
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -233,6 +252,7 @@
 				36A08A81275B767100F04541 /* Puzzle01_2.cpp in Sources */,
 				36A08A96275BA83B00F04541 /* Puzzle03_2.cpp in Sources */,
 				36A08AA3275CC22000F04541 /* Puzzle05_1.cpp in Sources */,
+				36A08AAA275D7EEF00F04541 /* Puzzle06_1.cpp in Sources */,
 				36A08A8F275BA77D00F04541 /* Puzzle00_2.cpp in Sources */,
 				36A08A9D275BCFA300F04541 /* Puzzle04_2.cpp in Sources */,
 				36A08A9C275BCFA300F04541 /* Puzzle04_1.cpp in Sources */,
@@ -242,6 +262,7 @@
 				36A08A95275BA83B00F04541 /* Puzzle03_1.cpp in Sources */,
 				36A08A88275B972100F04541 /* Puzzle02_1.cpp in Sources */,
 				36A08A87275B972100F04541 /* Puzzle02_2.cpp in Sources */,
+				36A08AAB275D7EEF00F04541 /* Puzzle06_2.cpp in Sources */,
 				36A08A8E275BA77D00F04541 /* Puzzle00_1.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
