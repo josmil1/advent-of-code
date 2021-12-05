@@ -11,7 +11,7 @@ int main(int argc, const char *argv[])
 {
     std::cout << "Merry Christmas!\n";
 
-    puzzle_04_1();
+    puzzle_05_1();
 
     return 0;
 }
