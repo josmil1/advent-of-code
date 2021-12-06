@@ -8,13 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		369F6AB72586FA6800699575 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 369F6AB62586FA6800699575 /* main.cpp */; };
-		36A08AA3275CC22000F04541 /* Puzzle05_1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08AA0275CC22000F04541 /* Puzzle05_1.cpp */; };
-		36A08AA4275CC22000F04541 /* Puzzle05_2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08AA1275CC22000F04541 /* Puzzle05_2.cpp */; };
 		36A08AB3275EC05E00F04541 /* Puzzle06.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08AAF275EC05E00F04541 /* Puzzle06.cpp */; };
 		36A08AB5275EC2F100F04541 /* Puzzle01.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08AB4275EC2F100F04541 /* Puzzle01.cpp */; };
 		36A08AB7275EC4C800F04541 /* Puzzle02.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08AB6275EC4C800F04541 /* Puzzle02.cpp */; };
 		36A08AB9275ECE9D00F04541 /* Puzzle03.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08AB8275ECE9D00F04541 /* Puzzle03.cpp */; };
 		36A08ABB275ED38800F04541 /* Puzzle04.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08ABA275ED38800F04541 /* Puzzle04.cpp */; };
+		36A08ABD275ED50D00F04541 /* Puzzle05.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08ABC275ED50D00F04541 /* Puzzle05.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -33,10 +32,6 @@
 		369F6AB32586FA6800699575 /* Advent2021 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Advent2021; sourceTree = BUILT_PRODUCTS_DIR; };
 		369F6AB62586FA6800699575 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		369F6ABF2586FB1D00699575 /* Puzzles.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Puzzles.hpp; sourceTree = "<group>"; };
-		36A08A9F275CC22000F04541 /* input_0.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_0.txt; sourceTree = "<group>"; };
-		36A08AA0275CC22000F04541 /* Puzzle05_1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle05_1.cpp; sourceTree = "<group>"; };
-		36A08AA1275CC22000F04541 /* Puzzle05_2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle05_2.cpp; sourceTree = "<group>"; };
-		36A08AA2275CC22000F04541 /* input.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input.txt; sourceTree = "<group>"; };
 		36A08AAF275EC05E00F04541 /* Puzzle06.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle06.cpp; sourceTree = "<group>"; };
 		36A08AB1275EC05E00F04541 /* input_06.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_06.txt; sourceTree = "<group>"; };
 		36A08AB2275EC05E00F04541 /* input.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input.txt; sourceTree = "<group>"; };
@@ -44,6 +39,12 @@
 		36A08AB6275EC4C800F04541 /* Puzzle02.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle02.cpp; sourceTree = "<group>"; };
 		36A08AB8275ECE9D00F04541 /* Puzzle03.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle03.cpp; sourceTree = "<group>"; };
 		36A08ABA275ED38800F04541 /* Puzzle04.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle04.cpp; sourceTree = "<group>"; };
+		36A08ABC275ED50D00F04541 /* Puzzle05.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle05.cpp; sourceTree = "<group>"; };
+		36A08ABE275ED51C00F04541 /* input_04.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_04.txt; sourceTree = "<group>"; };
+		36A08ABF275ED51C00F04541 /* input_01.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_01.txt; sourceTree = "<group>"; };
+		36A08AC0275ED51C00F04541 /* input_05.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_05.txt; sourceTree = "<group>"; };
+		36A08AC1275ED51C00F04541 /* input_03.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_03.txt; sourceTree = "<group>"; };
+		36A08AC2275ED51C00F04541 /* input_02.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_02.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,22 +79,10 @@
 			children = (
 				36A08AB0275EC05E00F04541 /* input */,
 				36A08AAE275EC05E00F04541 /* cpp */,
-				36A08A9E275CC22000F04541 /* Puzzle05 */,
 				369F6AB62586FA6800699575 /* main.cpp */,
 				369F6ABF2586FB1D00699575 /* Puzzles.hpp */,
 			);
 			path = Advent2021;
-			sourceTree = "<group>";
-		};
-		36A08A9E275CC22000F04541 /* Puzzle05 */ = {
-			isa = PBXGroup;
-			children = (
-				36A08A9F275CC22000F04541 /* input_0.txt */,
-				36A08AA0275CC22000F04541 /* Puzzle05_1.cpp */,
-				36A08AA1275CC22000F04541 /* Puzzle05_2.cpp */,
-				36A08AA2275CC22000F04541 /* input.txt */,
-			);
-			path = Puzzle05;
 			sourceTree = "<group>";
 		};
 		36A08AAE275EC05E00F04541 /* cpp */ = {
@@ -103,6 +92,7 @@
 				36A08AB6275EC4C800F04541 /* Puzzle02.cpp */,
 				36A08AB8275ECE9D00F04541 /* Puzzle03.cpp */,
 				36A08ABA275ED38800F04541 /* Puzzle04.cpp */,
+				36A08ABC275ED50D00F04541 /* Puzzle05.cpp */,
 				36A08AAF275EC05E00F04541 /* Puzzle06.cpp */,
 			);
 			path = cpp;
@@ -111,8 +101,13 @@
 		36A08AB0275EC05E00F04541 /* input */ = {
 			isa = PBXGroup;
 			children = (
-				36A08AB1275EC05E00F04541 /* input_06.txt */,
 				36A08AB2275EC05E00F04541 /* input.txt */,
+				36A08ABF275ED51C00F04541 /* input_01.txt */,
+				36A08AC2275ED51C00F04541 /* input_02.txt */,
+				36A08AC1275ED51C00F04541 /* input_03.txt */,
+				36A08ABE275ED51C00F04541 /* input_04.txt */,
+				36A08AC0275ED51C00F04541 /* input_05.txt */,
+				36A08AB1275EC05E00F04541 /* input_06.txt */,
 			);
 			path = input;
 			sourceTree = "<group>";
@@ -173,11 +168,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36A08ABD275ED50D00F04541 /* Puzzle05.cpp in Sources */,
 				36A08AB7275EC4C800F04541 /* Puzzle02.cpp in Sources */,
 				36A08ABB275ED38800F04541 /* Puzzle04.cpp in Sources */,
-				36A08AA3275CC22000F04541 /* Puzzle05_1.cpp in Sources */,
 				36A08AB3275EC05E00F04541 /* Puzzle06.cpp in Sources */,
-				36A08AA4275CC22000F04541 /* Puzzle05_2.cpp in Sources */,
 				36A08AB9275ECE9D00F04541 /* Puzzle03.cpp in Sources */,
 				36A08AB5275EC2F100F04541 /* Puzzle01.cpp in Sources */,
 				369F6AB72586FA6800699575 /* main.cpp in Sources */,
