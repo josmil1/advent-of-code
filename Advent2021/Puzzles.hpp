@@ -30,8 +30,7 @@ void puzzle_04_2();
 void puzzle_05_1();
 void puzzle_05_2();
 
-void puzzle_06_1();
-void puzzle_06_2();
+void puzzle_06();
 
 void puzzle_07_1();
 void puzzle_07_2();

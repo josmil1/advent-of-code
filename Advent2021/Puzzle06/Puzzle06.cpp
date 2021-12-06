@@ -8,7 +8,7 @@
 
 using AgeMap = std::map<uint32_t, uint64_t>;
 
-void puzzle_06_1()
+void puzzle_06()
 {
     std::ifstream in_file("/Users/josmil17/Programming/advent21/Advent2021/Advent2021/Puzzle06/input_0.txt");
     if (!in_file)
@@ -18,9 +18,11 @@ void puzzle_06_1()
     }
 
     AgeMap age_count;
+    AgeMap new_age_count;
     for (uint32_t i = 0; i < MAX_AGE; i++)
     {
         age_count[i] = 0;
+        new_age_count[i] = 0;
     }
 
     // Parse input
@@ -37,36 +39,21 @@ void puzzle_06_1()
         age_count[std::stoi(substr)]++;
     }
 
-    for (uint32_t i = 0; i < MAX_AGE; i++)
-    {
-        //std::cout << "Initial State: " << i << " -> " << age_count[i] << std::endl;
-    }
-
     for (uint32_t i = 0; i < DAY_COUNT; i++)
     {
-        // Save modifications in a new map, so that they are
-        // all simultaneous
-        AgeMap new_age_count;
-        for (uint32_t i = 0; i < MAX_AGE; i++)
-        {
-            new_age_count[i] = 0;
-        }
-
         for (uint32_t j = 0; j < MAX_AGE; j++)
         {
-            //std::cout << "After day " << i + 1 << ": " << j << " -> " << age_count[j] << std::endl;
-
-            switch (j)
+            // Save modifications in a new map, so that they are
+            // all simultaneous
+            if (j > 0)
             {
-            case 0:
+                new_age_count[j - 1] += age_count[j];
+            }
+            else
+            {
                 // Spawn new fish and reset timer to max adult age
                 new_age_count[MAX_AGE - 1] += age_count[j];
                 new_age_count[MAX_ADULT_AGE - 1] += age_count[j];
-                break;
-
-            default:
-                new_age_count[j - 1] += age_count[j];
-                break;
             }
         }
 
@@ -74,6 +61,7 @@ void puzzle_06_1()
         for (uint32_t i = 0; i < MAX_AGE; i++)
         {
             age_count[i] = new_age_count[i];
+            new_age_count[i] = 0;
         }
     }
 
