@@ -58,6 +58,16 @@ namespace
             return score;
         }
 
+        void set_id(uint64_t _id)
+        {
+            id = _id;
+        }
+
+        uint64_t get_id()
+        {
+            return id;
+        }
+
     private:
         struct Position
         {
@@ -71,21 +81,16 @@ namespace
 
         uint64_t score{0};
 
+        uint64_t id{0};
+
         std::unordered_map<uint32_t, uint32_t> row_marks;
 
         std::unordered_map<uint32_t, uint32_t> col_marks;
     };
 }
 
-void puzzle_04_1()
+uint64_t puzzle_04_part(std::ifstream &in_file, bool part_1)
 {
-    std::ifstream in_file("/Users/josmil17/Programming/advent21/Advent2021/Advent2021/Puzzle04/input_0.txt");
-    if (!in_file)
-    {
-        std::cerr << "Cannot open file";
-        return;
-    }
-
     // Parse input
     std::string line;
 
@@ -102,12 +107,14 @@ void puzzle_04_1()
 
     // Fill in Bingo cards
     std::vector<BingoCard> cards;
+    uint64_t card_count = 0;
     while (std::getline(in_file, line))
     {
         if (line.size() > 0)
         {
             //std::cout << "Adding card" << std::endl;
             BingoCard new_card;
+            new_card.set_id(card_count);
             for (uint32_t row = 0; row < ROW_SIZE; row++)
             {
                 std::stringstream ss{line};
@@ -122,32 +129,36 @@ void puzzle_04_1()
                 std::getline(in_file, line);
             }
             cards.push_back(new_card);
+            card_count++;
         }
     }
 
     // Call numbers and determine winner
     bool won = false;
+    uint64_t card_id = 0;
     for (auto &number : marked_numbers)
     {
-        if (won)
+        auto it = cards.begin();
+        while (it != cards.end())
         {
-            break;
-        }
-        else
-        {
-            std::cout << "Calling " << number << std::endl;
-            for (uint32_t c = 0; c < cards.size(); c++)
+            won = it->mark_number(number);
+            if (won)
             {
-                won = cards[c].mark_number(number);
-
-                if (won)
-                {
-                    std::cout << "Bingo! Card: " << c << " Score: " << cards[c].get_score() << std::endl;
-                    break;
-                }
+                card_id = it->get_id();
+                std::cout << "Bingo! Card: " << card_id << " Score: " << it->get_score() << std::endl;
+                it = cards.erase(it);
+            }
+            else
+            {
+                ++it;
             }
         }
     }
 
-    in_file.close();
+    return card_id;
+}
+
+uint64_t puzzle_04(std::ifstream &in_file)
+{
+    return puzzle_04_part(in_file, false);
 }
