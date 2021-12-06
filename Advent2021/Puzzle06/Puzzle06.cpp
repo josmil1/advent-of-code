@@ -8,15 +8,8 @@
 
 using AgeMap = std::map<uint32_t, uint64_t>;
 
-void puzzle_06()
+uint64_t puzzle_06(std::ifstream &in_file)
 {
-    std::ifstream in_file("/Users/josmil17/Programming/advent21/Advent2021/Advent2021/Puzzle06/input_0.txt");
-    if (!in_file)
-    {
-        std::cerr << "Cannot open file";
-        return;
-    }
-
     AgeMap age_count;
     AgeMap new_age_count;
     for (uint32_t i = 0; i < MAX_AGE; i++)
@@ -72,7 +65,5 @@ void puzzle_06()
         total_fish += age_count[i];
     }
 
-    std::cout << total_fish << std::endl;
-
-    in_file.close();
+    return total_fish;
 }
