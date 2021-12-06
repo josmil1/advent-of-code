@@ -15,9 +15,6 @@
 #include <unordered_map>
 #include <numeric>
 
-void puzzle_01_1();
-void puzzle_01_2();
-
 void puzzle_02_1();
 void puzzle_02_2();
 
@@ -30,6 +27,7 @@ void puzzle_04_2();
 void puzzle_05_1();
 void puzzle_05_2();
 
+uint64_t puzzle_01(std::ifstream &in_file);
 uint64_t puzzle_06(std::ifstream &in_file);
 
 void puzzle_07_1();

@@ -1,14 +1,31 @@
 #include "Puzzles.hpp"
 
-void puzzle_01_2()
+uint64_t puzzle_01_1(std::ifstream &in_file)
 {
-    std::ifstream in_file("/Users/josmil17/Programming/advent21/Advent2021/Advent2021/Puzzle01/input_0.txt");
-    if (!in_file)
+    // Parse input
+    std::string line;
+    uint32_t increase_count = 0;
+    int32_t prev_number = -1;
+    while (std::getline(in_file, line))
     {
-        std::cerr << "Cannot open file";
-        return;
+        if (line.size() > 0)
+        {
+            uint32_t input_number = std::stoi(line);
+            int32_t difference = input_number - prev_number;
+            if (prev_number > 0 && difference > 0)
+            {
+                //std::cout << input_number << " - " << prev_number << " = " << difference << std::endl;
+                increase_count++;
+            }
+            prev_number = input_number;
+        }
     }
 
+    return increase_count;
+}
+
+uint64_t puzzle_01_2(std::ifstream &in_file)
+{
     // Parse input
     std::string line;
     uint32_t increase_count = 0;
@@ -36,7 +53,7 @@ void puzzle_01_2()
                 // Calculate differences and update sums
                 sum_index = (sum_index > window_size - 2) ? 0 : sum_index + 1;
                 const uint32_t prev_sum_index = (sum_index == 0) ? window_size - 1 : sum_index - 1;
-                
+
                 for (int i = 0; i < window_size; i++)
                 {
                     // Add to all sums except the previous one, which will be
@@ -62,7 +79,10 @@ void puzzle_01_2()
         }
     }
 
-    std::cout << increase_count << std::endl;
+    return increase_count;
+}
 
-    in_file.close();
+uint64_t puzzle_01(std::ifstream &in_file)
+{
+    return puzzle_01_1(in_file);
 }
