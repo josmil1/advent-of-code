@@ -15,7 +15,24 @@
 		36A08ABB275ED38800F04541 /* Puzzle04.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08ABA275ED38800F04541 /* Puzzle04.cpp */; };
 		36A08ABD275ED50D00F04541 /* Puzzle05.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08ABC275ED50D00F04541 /* Puzzle05.cpp */; };
 		36A08AC5275ED70500F04541 /* Puzzle07.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08AC3275ED70500F04541 /* Puzzle07.cpp */; };
-		36A08AC6275ED70500F04541 /* template.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08AC4275ED70500F04541 /* template.cpp */; };
+		36A08ADA2760185E00F04541 /* Puzzle12.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08AC82760185D00F04541 /* Puzzle12.cpp */; };
+		36A08ADB2760185E00F04541 /* Puzzle23.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08AC92760185D00F04541 /* Puzzle23.cpp */; };
+		36A08ADC2760185E00F04541 /* Puzzle25.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08ACA2760185D00F04541 /* Puzzle25.cpp */; };
+		36A08ADD2760185E00F04541 /* Puzzle19.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08ACB2760185D00F04541 /* Puzzle19.cpp */; };
+		36A08ADE2760185E00F04541 /* Puzzle15.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08ACC2760185D00F04541 /* Puzzle15.cpp */; };
+		36A08ADF2760185E00F04541 /* Puzzle14.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08ACD2760185D00F04541 /* Puzzle14.cpp */; };
+		36A08AE02760185E00F04541 /* Puzzle09.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08ACE2760185D00F04541 /* Puzzle09.cpp */; };
+		36A08AE12760185E00F04541 /* Puzzle17.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08ACF2760185D00F04541 /* Puzzle17.cpp */; };
+		36A08AE22760185E00F04541 /* Puzzle21.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08AD02760185D00F04541 /* Puzzle21.cpp */; };
+		36A08AE32760185E00F04541 /* Puzzle18.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08AD12760185D00F04541 /* Puzzle18.cpp */; };
+		36A08AE42760185E00F04541 /* Puzzle20.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08AD22760185E00F04541 /* Puzzle20.cpp */; };
+		36A08AE52760185E00F04541 /* Puzzle13.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08AD32760185E00F04541 /* Puzzle13.cpp */; };
+		36A08AE62760185E00F04541 /* Puzzle22.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08AD42760185E00F04541 /* Puzzle22.cpp */; };
+		36A08AE72760185E00F04541 /* Puzzle10.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08AD52760185E00F04541 /* Puzzle10.cpp */; };
+		36A08AE82760185E00F04541 /* Puzzle24.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08AD62760185E00F04541 /* Puzzle24.cpp */; };
+		36A08AE92760185E00F04541 /* Puzzle16.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08AD72760185E00F04541 /* Puzzle16.cpp */; };
+		36A08AEA2760185E00F04541 /* Puzzle08.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08AD82760185E00F04541 /* Puzzle08.cpp */; };
+		36A08AEB2760185E00F04541 /* Puzzle11.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36A08AD92760185E00F04541 /* Puzzle11.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -47,8 +64,43 @@
 		36A08AC1275ED51C00F04541 /* input_03.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_03.txt; sourceTree = "<group>"; };
 		36A08AC2275ED51C00F04541 /* input_02.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_02.txt; sourceTree = "<group>"; };
 		36A08AC3275ED70500F04541 /* Puzzle07.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle07.cpp; sourceTree = "<group>"; };
-		36A08AC4275ED70500F04541 /* template.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = template.cpp; sourceTree = "<group>"; };
 		36A08AC7275ED71200F04541 /* input_07.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_07.txt; sourceTree = "<group>"; };
+		36A08AC82760185D00F04541 /* Puzzle12.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle12.cpp; sourceTree = "<group>"; };
+		36A08AC92760185D00F04541 /* Puzzle23.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle23.cpp; sourceTree = "<group>"; };
+		36A08ACA2760185D00F04541 /* Puzzle25.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle25.cpp; sourceTree = "<group>"; };
+		36A08ACB2760185D00F04541 /* Puzzle19.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle19.cpp; sourceTree = "<group>"; };
+		36A08ACC2760185D00F04541 /* Puzzle15.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle15.cpp; sourceTree = "<group>"; };
+		36A08ACD2760185D00F04541 /* Puzzle14.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle14.cpp; sourceTree = "<group>"; };
+		36A08ACE2760185D00F04541 /* Puzzle09.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle09.cpp; sourceTree = "<group>"; };
+		36A08ACF2760185D00F04541 /* Puzzle17.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle17.cpp; sourceTree = "<group>"; };
+		36A08AD02760185D00F04541 /* Puzzle21.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle21.cpp; sourceTree = "<group>"; };
+		36A08AD12760185D00F04541 /* Puzzle18.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle18.cpp; sourceTree = "<group>"; };
+		36A08AD22760185E00F04541 /* Puzzle20.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle20.cpp; sourceTree = "<group>"; };
+		36A08AD32760185E00F04541 /* Puzzle13.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle13.cpp; sourceTree = "<group>"; };
+		36A08AD42760185E00F04541 /* Puzzle22.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle22.cpp; sourceTree = "<group>"; };
+		36A08AD52760185E00F04541 /* Puzzle10.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle10.cpp; sourceTree = "<group>"; };
+		36A08AD62760185E00F04541 /* Puzzle24.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle24.cpp; sourceTree = "<group>"; };
+		36A08AD72760185E00F04541 /* Puzzle16.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle16.cpp; sourceTree = "<group>"; };
+		36A08AD82760185E00F04541 /* Puzzle08.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle08.cpp; sourceTree = "<group>"; };
+		36A08AD92760185E00F04541 /* Puzzle11.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Puzzle11.cpp; sourceTree = "<group>"; };
+		36A08AEC2760188B00F04541 /* input_09.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_09.txt; sourceTree = "<group>"; };
+		36A08AED2760188B00F04541 /* input_16.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_16.txt; sourceTree = "<group>"; };
+		36A08AEE2760188B00F04541 /* input_18.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_18.txt; sourceTree = "<group>"; };
+		36A08AEF2760188B00F04541 /* input_10.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_10.txt; sourceTree = "<group>"; };
+		36A08AF02760188B00F04541 /* input_20.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_20.txt; sourceTree = "<group>"; };
+		36A08AF12760188B00F04541 /* input_14.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_14.txt; sourceTree = "<group>"; };
+		36A08AF22760188C00F04541 /* input_25.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_25.txt; sourceTree = "<group>"; };
+		36A08AF32760188C00F04541 /* input_22.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_22.txt; sourceTree = "<group>"; };
+		36A08AF42760188C00F04541 /* input_12.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_12.txt; sourceTree = "<group>"; };
+		36A08AF52760188C00F04541 /* input_15.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_15.txt; sourceTree = "<group>"; };
+		36A08AF62760188C00F04541 /* input_24.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_24.txt; sourceTree = "<group>"; };
+		36A08AF72760188C00F04541 /* input_13.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_13.txt; sourceTree = "<group>"; };
+		36A08AF82760188C00F04541 /* input_21.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_21.txt; sourceTree = "<group>"; };
+		36A08AF92760188C00F04541 /* input_23.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_23.txt; sourceTree = "<group>"; };
+		36A08AFA2760188C00F04541 /* input_11.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_11.txt; sourceTree = "<group>"; };
+		36A08AFB2760188C00F04541 /* input_08.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_08.txt; sourceTree = "<group>"; };
+		36A08AFC2760188C00F04541 /* input_19.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_19.txt; sourceTree = "<group>"; };
+		36A08AFD2760188C00F04541 /* input_17.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = input_17.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,7 +144,6 @@
 		36A08AAE275EC05E00F04541 /* cpp */ = {
 			isa = PBXGroup;
 			children = (
-				36A08AC4275ED70500F04541 /* template.cpp */,
 				36A08AB4275EC2F100F04541 /* Puzzle01.cpp */,
 				36A08AB6275EC4C800F04541 /* Puzzle02.cpp */,
 				36A08AB8275ECE9D00F04541 /* Puzzle03.cpp */,
@@ -100,6 +151,24 @@
 				36A08ABC275ED50D00F04541 /* Puzzle05.cpp */,
 				36A08AAF275EC05E00F04541 /* Puzzle06.cpp */,
 				36A08AC3275ED70500F04541 /* Puzzle07.cpp */,
+				36A08AD82760185E00F04541 /* Puzzle08.cpp */,
+				36A08ACE2760185D00F04541 /* Puzzle09.cpp */,
+				36A08AD52760185E00F04541 /* Puzzle10.cpp */,
+				36A08AD92760185E00F04541 /* Puzzle11.cpp */,
+				36A08AC82760185D00F04541 /* Puzzle12.cpp */,
+				36A08AD32760185E00F04541 /* Puzzle13.cpp */,
+				36A08ACD2760185D00F04541 /* Puzzle14.cpp */,
+				36A08ACC2760185D00F04541 /* Puzzle15.cpp */,
+				36A08AD72760185E00F04541 /* Puzzle16.cpp */,
+				36A08ACF2760185D00F04541 /* Puzzle17.cpp */,
+				36A08AD12760185D00F04541 /* Puzzle18.cpp */,
+				36A08ACB2760185D00F04541 /* Puzzle19.cpp */,
+				36A08AD22760185E00F04541 /* Puzzle20.cpp */,
+				36A08AD02760185D00F04541 /* Puzzle21.cpp */,
+				36A08AD42760185E00F04541 /* Puzzle22.cpp */,
+				36A08AC92760185D00F04541 /* Puzzle23.cpp */,
+				36A08AD62760185E00F04541 /* Puzzle24.cpp */,
+				36A08ACA2760185D00F04541 /* Puzzle25.cpp */,
 			);
 			path = cpp;
 			sourceTree = "<group>";
@@ -114,6 +183,24 @@
 				36A08AC0275ED51C00F04541 /* input_05.txt */,
 				36A08AB1275EC05E00F04541 /* input_06.txt */,
 				36A08AC7275ED71200F04541 /* input_07.txt */,
+				36A08AFB2760188C00F04541 /* input_08.txt */,
+				36A08AEC2760188B00F04541 /* input_09.txt */,
+				36A08AEF2760188B00F04541 /* input_10.txt */,
+				36A08AFA2760188C00F04541 /* input_11.txt */,
+				36A08AF42760188C00F04541 /* input_12.txt */,
+				36A08AF72760188C00F04541 /* input_13.txt */,
+				36A08AF12760188B00F04541 /* input_14.txt */,
+				36A08AF52760188C00F04541 /* input_15.txt */,
+				36A08AED2760188B00F04541 /* input_16.txt */,
+				36A08AFD2760188C00F04541 /* input_17.txt */,
+				36A08AEE2760188B00F04541 /* input_18.txt */,
+				36A08AFC2760188C00F04541 /* input_19.txt */,
+				36A08AF02760188B00F04541 /* input_20.txt */,
+				36A08AF82760188C00F04541 /* input_21.txt */,
+				36A08AF32760188C00F04541 /* input_22.txt */,
+				36A08AF92760188C00F04541 /* input_23.txt */,
+				36A08AF62760188C00F04541 /* input_24.txt */,
+				36A08AF22760188C00F04541 /* input_25.txt */,
 			);
 			path = input;
 			sourceTree = "<group>";
@@ -174,15 +261,32 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36A08AE72760185E00F04541 /* Puzzle10.cpp in Sources */,
+				36A08AE02760185E00F04541 /* Puzzle09.cpp in Sources */,
+				36A08AE42760185E00F04541 /* Puzzle20.cpp in Sources */,
+				36A08ADB2760185E00F04541 /* Puzzle23.cpp in Sources */,
+				36A08ADF2760185E00F04541 /* Puzzle14.cpp in Sources */,
+				36A08ADE2760185E00F04541 /* Puzzle15.cpp in Sources */,
+				36A08AE62760185E00F04541 /* Puzzle22.cpp in Sources */,
 				36A08ABD275ED50D00F04541 /* Puzzle05.cpp in Sources */,
 				36A08AB7275EC4C800F04541 /* Puzzle02.cpp in Sources */,
 				36A08ABB275ED38800F04541 /* Puzzle04.cpp in Sources */,
+				36A08AE12760185E00F04541 /* Puzzle17.cpp in Sources */,
 				36A08AB3275EC05E00F04541 /* Puzzle06.cpp in Sources */,
 				36A08AB9275ECE9D00F04541 /* Puzzle03.cpp in Sources */,
+				36A08AEA2760185E00F04541 /* Puzzle08.cpp in Sources */,
+				36A08AE82760185E00F04541 /* Puzzle24.cpp in Sources */,
 				36A08AB5275EC2F100F04541 /* Puzzle01.cpp in Sources */,
+				36A08AEB2760185E00F04541 /* Puzzle11.cpp in Sources */,
+				36A08AE32760185E00F04541 /* Puzzle18.cpp in Sources */,
+				36A08AE92760185E00F04541 /* Puzzle16.cpp in Sources */,
+				36A08ADA2760185E00F04541 /* Puzzle12.cpp in Sources */,
 				36A08AC5275ED70500F04541 /* Puzzle07.cpp in Sources */,
 				369F6AB72586FA6800699575 /* main.cpp in Sources */,
-				36A08AC6275ED70500F04541 /* template.cpp in Sources */,
+				36A08AE52760185E00F04541 /* Puzzle13.cpp in Sources */,
+				36A08ADC2760185E00F04541 /* Puzzle25.cpp in Sources */,
+				36A08ADD2760185E00F04541 /* Puzzle19.cpp in Sources */,
+				36A08AE22760185E00F04541 /* Puzzle21.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

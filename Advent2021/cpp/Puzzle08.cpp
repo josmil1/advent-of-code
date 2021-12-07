@@ -18,7 +18,7 @@ namespace
     }
 }
 
-uint64_t puzzle_00(std::ifstream &in_file)
+uint64_t puzzle_08(std::ifstream &in_file)
 {
     return solve(in_file, true);
 }
