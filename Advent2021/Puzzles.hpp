@@ -13,6 +13,7 @@
 #include <sstream>
 #include <unordered_map>
 #include <numeric>
+#include <algorithm>
 
 uint64_t puzzle_01(std::ifstream &in_file);
 uint64_t puzzle_02(std::ifstream &in_file);
