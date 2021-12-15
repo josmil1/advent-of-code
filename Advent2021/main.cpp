@@ -16,19 +16,21 @@
 
 #define FUNC_NAME CONC(puzzle_, DAY)
 
-int main() {
-  std::string input_file = "input/input_" + std::string(STR(DAY)) + ".txt";
-  std::ifstream in_file(input_file);
-  if (!in_file) {
-    std::cerr << "Cannot open file";
-    return 1;
-  }
+int main()
+{
+	std::string   input_file = "input/input_" + std::string(STR(DAY)) + ".txt";
+	std::ifstream in_file(input_file);
+	if (!in_file)
+	{
+		std::cerr << "Cannot open file";
+		return 1;
+	}
 
-  auto answer = FUNC_NAME(in_file);
+	auto answer = FUNC_NAME(in_file);
 
-  in_file.close();
+	in_file.close();
 
-  std::cout << "Answer: " << answer << std::endl;
+	std::cout << "Answer: " << answer << std::endl;
 
-  return 0;
+	return 0;
 }
