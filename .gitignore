@@ -1,2 +1,5 @@
 Advent2021/.vscode/*
 *.xcodeproj/*
+*.pch
+*.gch
+*.exe
