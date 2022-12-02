@@ -6,7 +6,6 @@ namespace
 {
 uint64_t puzzle_01_1(std::ifstream &in_file)
 {
-	// Parse input
 	std::string line;
 
 	uint64_t max     = 0;
@@ -34,7 +33,6 @@ uint64_t puzzle_01_1(std::ifstream &in_file)
 
 uint64_t puzzle_01_2(std::ifstream &in_file)
 {
-	// Parse input
 	std::string line;
 
 	std::set<uint64_t> maxes;

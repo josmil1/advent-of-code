@@ -14,7 +14,6 @@ bool beats(uint32_t in, uint32_t out)
 
 uint64_t puzzle_02_1(std::ifstream &in_file)
 {
-	// Parse input
 	std::string line;
 
 	uint64_t score = 0;
@@ -22,6 +21,7 @@ uint64_t puzzle_02_1(std::ifstream &in_file)
 	{
 		if (line.size() > 0)
 		{
+			// Parse input
 			std::stringstream ss(line);
 			char              in_c, out_c;
 			ss >> in_c >> out_c;
@@ -48,7 +48,6 @@ uint64_t puzzle_02_1(std::ifstream &in_file)
 
 uint64_t puzzle_02_2(std::ifstream &in_file)
 {
-	// Parse input
 	std::string line;
 
 	uint64_t score = 0;
@@ -56,6 +55,7 @@ uint64_t puzzle_02_2(std::ifstream &in_file)
 	{
 		if (line.size() > 0)
 		{
+			// Parse input
 			std::stringstream ss(line);
 			char              in_c, result_c;
 			ss >> in_c >> result_c;
