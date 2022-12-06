@@ -1,5 +1,8 @@
 Advent2021/.vscode/*
+Advent2022/.vscode/*
 *.xcodeproj/*
 *.pch
 *.gch
 *.exe
+*.dSYM
+main
