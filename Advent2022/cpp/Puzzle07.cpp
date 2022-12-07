@@ -15,24 +15,17 @@ class Directory
 
 	void add_file(uint64_t s)
 	{
-		if (!initialized)
-		{
-			file_size += s;
-		}
+		file_size += s;
 	}
 
 	Directory *add_directory(std::string child_name)
 	{
-		Directory *ret = nullptr;
+		Directory *ret{nullptr};
+		auto       new_dir = std::make_unique<Directory>(child_name);
+		new_dir->set_parent(this);
+		ret = new_dir.get();
 
-		if (!initialized)
-		{
-			auto new_dir = std::make_unique<Directory>(child_name);
-			new_dir->set_parent(this);
-			ret = new_dir.get();
-
-			children.push_back(std::move(new_dir));
-		}
+		children.push_back(std::move(new_dir));
 
 		return ret;
 	}
@@ -64,7 +57,7 @@ class Directory
 
 	void print(uint32_t level = 0)
 	{
-		std::cout << name << "(" << get_total_size() << ")" << std::endl;
+		std::cout << get_name() << "(" << get_total_size() << ")" << std::endl;
 
 		if (children.size() > 0)
 		{
@@ -79,17 +72,11 @@ class Directory
 		}
 	}
 
-	void set_initialized(bool init)
-	{
-		initialized = init;
-	}
-
   private:
 	uint64_t                                file_size{};
 	std::vector<std::unique_ptr<Directory>> children;
 	Directory *                             parent{nullptr};
 	std::string                             name{};
-	bool                                    initialized{false};
 };
 
 using DirectoryList = std::vector<Directory *>;
@@ -127,11 +114,6 @@ std::unique_ptr<Directory> process_input(std::ifstream &in_file, DirectoryList &
 					else
 					{
 						// cd in
-						if (cur)
-						{
-							//cur->set_initialized(true);        // Any ls for the previous directory is done
-						}
-
 						if (!root)
 						{
 							root = std::make_unique<Directory>(name);
@@ -157,13 +139,6 @@ std::unique_ptr<Directory> process_input(std::ifstream &in_file, DirectoryList &
 					ss >> file_size;
 
 					cur->add_file(file_size);
-				}
-				else
-				{
-					// Dir
-					std::string dir_name, bin;
-					ss >> bin >> dir_name;
-					//dirs.push_back(cur->add_directory(dir_name));
 				}
 			}
 		}
