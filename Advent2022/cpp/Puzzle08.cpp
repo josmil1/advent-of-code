@@ -42,148 +42,153 @@ void print_grid(TreeGrid &grid)
 	}
 }
 
+using DigitMap = std::unordered_map<uint32_t, uint32_t>;
+
+struct VerticalHelpers
+{
+	std::vector<uint32_t> max_height{0};
+	std::vector<uint32_t> max_height_pos{0};
+	std::vector<uint32_t> prev_height{0};
+	std::vector<uint32_t> count{0};
+
+	std::vector<DigitMap> max_pos_for_digit;
+};
+
+struct HorizontalHelpers
+{
+	uint32_t max_height{0};
+	uint32_t max_height_pos{0};
+	uint32_t prev_height{0};
+	uint32_t count{0};
+
+	DigitMap max_pos_for_digit;
+};
+
+void update_visibility_count(uint32_t *max_height, uint32_t *max_height_pos, uint32_t *prev_height,
+                             uint32_t *count, uint32_t height, uint32_t pos, uint32_t max_pos, DigitMap *max_pos_for_digit)
+{
+	// std::cout << "mp " << (*max_pos_for_digit)[height] << " ";
+	*count = pos - (*max_pos_for_digit)[height];
+
+	for (uint32_t i = 0; i <= height; i++)
+	{
+		(*max_pos_for_digit)[i] = pos;
+	}
+
+	/*
+	if (0 == pos)
+	{
+	    *count = 0;
+	}
+	else if (height > *max_height)
+	{
+	    // Taller than all until now
+	    *count = pos;
+	}
+	else if (height > *prev_height)
+	{
+	    *count = pos - *max_height_pos;
+	}
+	else
+	{
+	    *count = 1;
+	}
+	*prev_height = height;
+
+	if (height >= *max_height)
+	{
+	    *max_height_pos = pos;
+	}
+	*max_height = std::max(*max_height, height);
+	*/
+}
+
+uint32_t update_visibility_count(uint32_t height, uint32_t pos, DigitMap *max_pos_for_digit)
+{
+	std::cout << "mp " << (*max_pos_for_digit)[height] << " ";
+	uint32_t count = std::abs(static_cast<int32_t>(pos) - static_cast<int32_t>((*max_pos_for_digit)[height]));
+
+	for (uint32_t i = 0; i <= height; i++)
+	{
+		(*max_pos_for_digit)[i] = pos;
+	}
+
+	return count;
+}
+
+constexpr uint32_t MAX_HEIGHT = 9;
+
 TreeGrid build_grid(std::ifstream &in_file)
 {
 	std::string line;
-	TreeGrid    columns;
+	TreeGrid    grid;
 	uint32_t    grid_size{0};
 
 	// Determine visibility from left/top while parsing the input
-	std::vector<uint32_t> max_height_from_top;        // Part 1
-	std::vector<uint32_t> top_count;                  // Part 2
-	std::vector<uint32_t> max_height_from_top_pos;
-	std::vector<uint32_t> prev_top_height;
-	uint32_t              row_i{0};
+	VerticalHelpers top{};
+	uint32_t        row{0};
 	while (std::getline(in_file, line))
 	{
 		if (line.size() > 0)
 		{
+			// Initialize helper structures
 			if (0 == grid_size)
 			{
 				grid_size = static_cast<uint32_t>(line.size());
-				columns.reserve(grid_size);
-				max_height_from_top.resize(grid_size);
-				top_count.resize(grid_size);
-				prev_top_height.resize(grid_size);
-				max_height_from_top_pos.resize(grid_size);
+				grid.reserve(grid_size);
+				top.max_height.resize(grid_size);
+				top.count.resize(grid_size);
+				top.prev_height.resize(grid_size);
+				top.max_height_pos.resize(grid_size);
+				top.max_pos_for_digit.reserve(grid_size);
+			}
+			std::vector<Tree> new_row;
+			new_row.reserve(grid_size);
+			HorizontalHelpers left{};
+			for (int i = 0; i <= MAX_HEIGHT; i++)
+			{
+				left.max_pos_for_digit[i] = 0;
+			}
+			for (int32_t col = 0; col < grid_size; col++)
+			{
+				DigitMap new_digit_map;
+				for (int i = 0; i <= MAX_HEIGHT; i++)
+				{
+					new_digit_map[i] = 0;
+				}
+				top.max_pos_for_digit.push_back(new_digit_map);
 			}
 
-			std::vector<Tree> row;
-			row.reserve(grid_size);
-
-			// Part 1
-			uint32_t max_height_from_left{0};
-
-			// Part 2
-			uint32_t left_count{0};
-			uint32_t prev_left_height{0};
-
-			uint32_t max_height_from_left_pos{0};
-
-			for (int32_t i = 0; i < grid_size; i++)
+			// Process lines, filling rows of grid
+			for (int32_t col = 0; col < grid_size; col++)
 			{
-				uint32_t height = line[i] - '0';
-
 				Tree new_tree{};
-				new_tree.height = height;
+				new_tree.height = line[col] - '0';
 
 				// Part 1
-				bool visible = 0 == i || 0 == row_i ||                                                  // left/top edge
-				               grid_size - 1 == i || grid_size - 1 == row_i ||                          // right/bottom edge
-				               height > max_height_from_left || height > max_height_from_top[i];        // inner
-				new_tree.visible = visible;
+				new_tree.visible = 0 == col || 0 == row ||                                                            // left/top edge
+				                   grid_size - 1 == col || grid_size - 1 == row ||                                    // right/bottom edge
+				                   new_tree.height > left.max_height || new_tree.height > top.max_height[col];        // inner
 
 				// Part 2
-				if (0 == i)
-				{
-					left_count = 0;
-				}
-				else if (height > max_height_from_left)
-				{
-					// Taller than all until now
-					left_count = i;
-				}
-				else if (height > prev_left_height)
-				{
-					left_count = i - max_height_from_left_pos;
-				}
-				else
-				{
-					left_count = 1;
-				}
-				/*
-				else
-				{
-				    if (prev_left_height >= height)
-				    {
-				        // Left tree blocks previous ones
-				        left_count = 1;
-				    }
-				    else
-				    {
-				        // Visible up to block
-				        left_count++;
-				    }
-				}
-				*/
-				new_tree.visible_left = left_count;
-				prev_left_height      = height;
+				update_visibility_count(&left.max_height, &left.max_height_pos, &left.prev_height, &left.count,
+				                        new_tree.height, col, grid_size - 1, &left.max_pos_for_digit);
+				new_tree.visible_left = left.count;
 
-				if (0 == row_i)
-				{
-					top_count[i] = 0;
-				}
-				else if (height > max_height_from_top[i])
-				{
-					// Taller than all until now
-					top_count[i] = row_i;
-				}
-				else if (height > prev_top_height[i])
-				{
-					top_count[i] = row_i - max_height_from_top_pos[i];
-				}
-				else
-				{
-					top_count[i] = 1;
-				}
-				/*
-				else
-				{
-				    if (prev_top_height[i] >= height)
-				    {
-				        // Top tree blocks previous ones
-				        top_count[i] = 1;
-				    }
-				    else
-				    {
-				        // Visible up to block
-				        top_count[i]++;
-				    }
-				}
-				*/
-				new_tree.visible_top = top_count[i];
-				prev_top_height[i]   = height;
+				update_visibility_count(&top.max_height[col], &top.max_height_pos[col], &top.prev_height[col], &top.count[col],
+				                        new_tree.height, row, grid_size - 1, &(top.max_pos_for_digit[col]));
+				new_tree.visible_top = top.count[col];
 
-				if (height >= max_height_from_left)
-				{
-					max_height_from_left_pos = i;
-				}
-				max_height_from_left = std::max(max_height_from_left, height);
-				if (height >= max_height_from_top[i])
-				{
-					max_height_from_top_pos[i] = row_i;
-				}
-				max_height_from_top[i] = std::max(max_height_from_top[i], height);
-
-				row.push_back(new_tree);
+				new_row.push_back(new_tree);
 			}
 
-			columns.push_back(row);
-			row_i++;
+			grid.push_back(new_row);
+			row++;
+			// std::cout << std::endl;
 		}
 	}
 
-	return columns;
+	return grid;
 }
 
 uint64_t puzzle_08_1(std::ifstream &in_file)
@@ -200,16 +205,32 @@ uint64_t puzzle_08_1(std::ifstream &in_file)
 	std::vector<uint32_t> prev_bottom_height;
 	bottom_count.resize(grid_size);
 	prev_bottom_height.resize(grid_size);
-	uint64_t max_score{0};
+	uint64_t        max_score{0};
+	VerticalHelpers bottom{};
+	for (int32_t col = 0; col < grid_size; col++)
+	{
+		DigitMap new_digit_map;
+		for (int i = 0; i <= MAX_HEIGHT; i++)
+		{
+			new_digit_map[i] = grid_size - 1;
+		}
+		bottom.max_pos_for_digit.push_back(new_digit_map);
+	}
 	for (int32_t row = grid_size - 1; row >= 0; row--)
 	{
-		uint32_t right_count{0};
-		uint32_t max_height_from_right_pos{grid_size - 1};
-		uint32_t max_height_from_right{0};
-		uint32_t prev_right_height{0};
+		uint32_t          right_count{0};
+		uint32_t          max_height_from_right_pos{grid_size - 1};
+		uint32_t          max_height_from_right{0};
+		uint32_t          prev_right_height{0};
+		HorizontalHelpers right{};
+		for (int i = 0; i <= MAX_HEIGHT; i++)
+		{
+			right.max_pos_for_digit[i] = grid_size - 1;
+		}
 		for (int32_t col = grid_size - 1; col >= 0; col--)
 		{
 			auto height = grid[row][col].height;
+			std::cout << height;
 
 			if (grid_size - 1 == col)
 			{
@@ -224,86 +245,63 @@ uint64_t puzzle_08_1(std::ifstream &in_file)
 			                          height > max_height_from_right || height > max_height_from_bottom[col];
 
 			// Part 2
+			grid[row][col].visible_right  = update_visibility_count(height, col, &right.max_pos_for_digit);
+			grid[row][col].visible_bottom = update_visibility_count(height, row, &(bottom.max_pos_for_digit[col]));
+
+			/*
 			if (grid_size - 1 == col)
 			{
-				right_count = 0;
+			    right_count = 0;
 			}
 			else if (height > max_height_from_right)
 			{
-				// Taller than all until now
-				right_count = grid_size - 1 - col;
+			    // Taller than all until now
+			    right_count = grid_size - 1 - col;
 			}
 			else if (height > prev_right_height)
 			{
-				right_count = max_height_from_right_pos - col;
+			    right_count = max_height_from_right_pos - col;
 			}
 			else
 			{
-				right_count = 1;
+			    right_count = 1;
 			}
-			/*
-			else
-			{
-			    if (prev_right_height >= height)
-			    {
-			        // Right tree blocks previous ones
-			        right_count = 1;
-			    }
-			    else
-			    {
-			        // Visible up to block
-			        right_count++;
-			    }
-			}
-			*/
 			grid[row][col].visible_right = right_count;
 			prev_right_height            = height;
+			*/
 
+			/*
 			if (grid_size - 1 == row)
 			{
-				bottom_count[col] = 0;
+			    bottom_count[col] = 0;
 			}
 			else if (height > max_height_from_bottom[col])
 			{
-				// Taller than all until now
-				bottom_count[col] = grid_size - 1 - row;
+			    // Taller than all until now
+			    bottom_count[col] = grid_size - 1 - row;
 			}
 			else if (height > prev_bottom_height[col])
 			{
-				bottom_count[col] = max_height_from_bottom_pos[col] - row;
+			    bottom_count[col] = max_height_from_bottom_pos[col] - row;
 			}
 			else
 			{
-				bottom_count[col] = 1;
+			    bottom_count[col] = 1;
 			}
-			/*
-			else
-			{
-			    if (prev_bottom_height[col] >= height)
-			    {
-			        // Bottom tree blocks previous ones
-			        bottom_count[col] = 1;
-			    }
-			    else
-			    {
-			        // Visible up to block
-			        bottom_count[col]++;
-			    }
-			}
-			*/
 			grid[row][col].visible_bottom = bottom_count[col];
 			prev_bottom_height[col]       = height;
 
 			if (height >= max_height_from_right)
 			{
-				max_height_from_right_pos = col;
+			    max_height_from_right_pos = col;
 			}
 			max_height_from_right = std::max(max_height_from_right, height);
 			if (height >= max_height_from_bottom[col])
 			{
-				max_height_from_bottom_pos[col] = row;
+			    max_height_from_bottom_pos[col] = row;
 			}
 			max_height_from_bottom[col] = std::max(max_height_from_bottom[col], height);
+			*/
 
 			if (grid[row][col].visible)
 			{
@@ -314,6 +312,7 @@ uint64_t puzzle_08_1(std::ifstream &in_file)
 			uint64_t score = tree.visible_left * tree.visible_right * tree.visible_bottom * tree.visible_top;
 			max_score      = std::max(max_score, score);
 		}
+		std::cout << std::endl;
 	}
 
 	print_grid(grid);
