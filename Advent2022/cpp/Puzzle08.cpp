@@ -1,7 +1,5 @@
 #include "Puzzles.hpp"
 
-#include <set>
-
 namespace
 {
 struct Tree
@@ -47,22 +45,24 @@ using DigitMap = std::unordered_map<uint32_t, uint32_t>;
 struct HorizontalHelpers
 {
 	uint32_t max_height{0};
-	DigitMap max_pos_for_digit;
+	DigitMap max_pos_for_height;
 };
 
 struct VerticalHelpers
 {
 	std::vector<uint32_t> max_height;
-	std::vector<DigitMap> max_pos_for_digit;
+	std::vector<DigitMap> max_pos_for_height;
 };
 
-uint32_t update_visibility_count(uint32_t height, uint32_t pos, DigitMap *max_pos_for_digit, uint32_t *max_height)
+uint32_t update_visibility_count(uint32_t height, uint32_t pos, DigitMap *max_pos_for_height, uint32_t *max_height)
 {
-	uint32_t count = std::abs(static_cast<int32_t>(pos) - static_cast<int32_t>((*max_pos_for_digit)[height]));
+	// Visibility in this direction is defined as the distance to the closest tree of equal or greater height
+	uint32_t count = std::abs(static_cast<int32_t>(pos) - static_cast<int32_t>((*max_pos_for_height)[height]));
 
+	// Keep track of how far is the first tree that blocks each possible height
 	for (uint32_t i = 0; i <= height; i++)
 	{
-		(*max_pos_for_digit)[i] = pos;
+		(*max_pos_for_height)[i] = pos;
 	}
 
 	*max_height = std::max(*max_height, height);
@@ -89,15 +89,16 @@ TreeGrid build_grid(std::ifstream &in_file)
 			// Initialize helper structures
 			for (int i = 0; i <= MAX_HEIGHT; i++)
 			{
-				left.max_pos_for_digit[i] = 0;
+				left.max_pos_for_height[i] = 0;
 			}
 			left.max_height = 0;
+
 			if (0 == grid_size)
 			{
 				grid_size = static_cast<uint32_t>(line.size());
 				grid.reserve(grid_size);
 				top.max_height.resize(grid_size);
-				top.max_pos_for_digit.reserve(grid_size);
+				top.max_pos_for_height.reserve(grid_size);
 
 				for (int32_t col = 0; col < grid_size; col++)
 				{
@@ -106,7 +107,7 @@ TreeGrid build_grid(std::ifstream &in_file)
 					{
 						new_digit_map[i] = 0;
 					}
-					top.max_pos_for_digit.push_back(new_digit_map);
+					top.max_pos_for_height.push_back(new_digit_map);
 				}
 			}
 
@@ -124,8 +125,8 @@ TreeGrid build_grid(std::ifstream &in_file)
 				                   new_tree.height > left.max_height || new_tree.height > top.max_height[col];        // inner
 
 				// Part 2
-				new_tree.visible_left = update_visibility_count(new_tree.height, col, &left.max_pos_for_digit, &left.max_height);
-				new_tree.visible_top  = update_visibility_count(new_tree.height, row, &top.max_pos_for_digit[col], &top.max_height[col]);
+				new_tree.visible_left = update_visibility_count(new_tree.height, col, &left.max_pos_for_height, &left.max_height);
+				new_tree.visible_top  = update_visibility_count(new_tree.height, row, &top.max_pos_for_height[col], &top.max_height[col]);
 
 				new_row.push_back(new_tree);
 			}
@@ -152,7 +153,7 @@ void process_grid(TreeGrid &grid, uint32_t *total_visible, uint32_t *max_score)
 		{
 			new_digit_map[i] = grid_size - 1;
 		}
-		bottom.max_pos_for_digit.push_back(new_digit_map);
+		bottom.max_pos_for_height.push_back(new_digit_map);
 	}
 	bottom.max_height.resize(grid_size);
 
@@ -161,7 +162,7 @@ void process_grid(TreeGrid &grid, uint32_t *total_visible, uint32_t *max_score)
 	{
 		for (int i = 0; i <= MAX_HEIGHT; i++)
 		{
-			right.max_pos_for_digit[i] = grid_size - 1;
+			right.max_pos_for_height[i] = grid_size - 1;
 		}
 		right.max_height = 0;
 
@@ -177,8 +178,8 @@ void process_grid(TreeGrid &grid, uint32_t *total_visible, uint32_t *max_score)
 			}
 
 			// Part 2
-			tree.visible_right  = update_visibility_count(tree.height, col, &right.max_pos_for_digit, &right.max_height);
-			tree.visible_bottom = update_visibility_count(tree.height, row, &bottom.max_pos_for_digit[col], &bottom.max_height[col]);
+			tree.visible_right  = update_visibility_count(tree.height, col, &right.max_pos_for_height, &right.max_height);
+			tree.visible_bottom = update_visibility_count(tree.height, row, &bottom.max_pos_for_height[col], &bottom.max_height[col]);
 			uint32_t score      = tree.visible_left * tree.visible_right * tree.visible_bottom * tree.visible_top;
 			*max_score          = std::max(*max_score, score);
 		}
