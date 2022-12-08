@@ -56,16 +56,17 @@ struct VerticalHelpers
 
 uint32_t update_visibility_count(uint32_t height, uint32_t pos, DigitMap *max_pos_for_height, uint32_t *max_height)
 {
-	// Visibility in this direction is defined as the distance to the closest tree of equal or greater height
+	// For Part 1, keep track of maximum height in this direction
+	*max_height = std::max(*max_height, height);
+
+	// For Part 2, visibility is defined as the distance to the closest tree of equal or greater height
 	uint32_t count = std::abs(static_cast<int32_t>(pos) - static_cast<int32_t>((*max_pos_for_height)[height]));
 
-	// Keep track of how far is the first tree that blocks each possible height
+	// Keep track of how far in this direction is the first tree that blocks each possible height
 	for (uint32_t i = 0; i <= height; i++)
 	{
 		(*max_pos_for_height)[i] = pos;
 	}
-
-	*max_height = std::max(*max_height, height);
 
 	return count;
 }
