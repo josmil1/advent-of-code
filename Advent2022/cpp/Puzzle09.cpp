@@ -60,12 +60,34 @@ int32_t close_gap(int32_t from, int32_t to)
 	return (from > to) ? from - 1 : from + 1;
 }
 
-uint64_t puzzle_09_1(std::ifstream &in_file)
+void update_position(Pos *pos, const Pos ref)
+{
+	bool too_far_x        = abs(ref.x - pos->x) > 1;
+	bool too_far_y        = abs(ref.y - pos->y) > 1;
+	bool diff_row_and_col = ref.x != pos->x && ref.y != pos->y;
+	if (too_far_x || too_far_y)
+	{
+		if (too_far_x || diff_row_and_col)
+		{
+			pos->x = close_gap(pos->x, ref.x);
+		}
+
+		if (too_far_y || diff_row_and_col)
+		{
+			pos->y = close_gap(pos->y, ref.y);
+		}
+	}
+}
+
+uint64_t solve(std::ifstream &in_file, const uint32_t knot_count)
 {
 	std::string line;
 
 	Grid grid;
-	Pos  head, tail, min, max;
+	Pos  min, max;
+	Pos  knots[knot_count];
+	Pos *head = &knots[0];
+	Pos *tail = &knots[knot_count - 1];
 
 	while (std::getline(in_file, line))
 	{
@@ -83,25 +105,25 @@ uint64_t puzzle_09_1(std::ifstream &in_file)
 					case 'U':
 					{
 						// Move up
-						head.y++;
+						head->y++;
 						break;
 					}
 					case 'D':
 					{
 						// Move down
-						head.y--;
+						head->y--;
 						break;
 					}
 					case 'L':
 					{
 						// Move left
-						head.x--;
+						head->x--;
 						break;
 					}
 					case 'R':
 					{
 						// Move right
-						head.x++;
+						head->x++;
 						break;
 					}
 					default:
@@ -111,54 +133,35 @@ uint64_t puzzle_09_1(std::ifstream &in_file)
 					}
 				}
 
-				bool too_far_x        = abs(head.x - tail.x) > 1;
-				bool too_far_y        = abs(head.y - tail.y) > 1;
-				bool diff_row_and_col = head.x != tail.x && head.y != tail.y;
-				if (too_far_x || too_far_y)
+				for (int i = 1; i < knot_count; i++)
 				{
-					if (too_far_x || diff_row_and_col)
-					{
-						tail.x = close_gap(tail.x, head.x);
-					}
-
-					if (too_far_y || diff_row_and_col)
-					{
-						tail.y = close_gap(tail.y, head.y);
-					}
+					update_position(&knots[i], knots[i - 1]);
 				}
 
-				auto grid_key  = key(tail.x, tail.y);
+				auto grid_key  = key(tail->x, tail->y);
 				grid[grid_key] = true;
 
-				max.x = std::max(max.x, head.x);
-				max.y = std::max(max.y, head.y);
-				min.x = std::min(min.x, head.x);
-				min.y = std::min(min.y, head.y);
-
-				// print(grid, max_x, max_y, head, tail);
-				// std::cout << "--------------" << std::endl;
+				max.x = std::max(max.x, head->x);
+				max.y = std::max(max.y, head->y);
+				min.x = std::min(min.x, head->x);
+				min.y = std::min(min.y, head->y);
 			}
 		}
 	}
 
-	auto visited = print(grid, min, max, head, tail);
+	auto visited = print(grid, min, max, *head, *tail);
 
 	return visited;
 }
 
+uint64_t puzzle_09_1(std::ifstream &in_file)
+{
+	return solve(in_file, 2);
+}
+
 uint64_t puzzle_09_2(std::ifstream &in_file)
 {
-	std::string line;
-
-	while (std::getline(in_file, line))
-	{
-		if (line.size() > 0)
-		{
-			std::cout << line << std::endl;
-		}
-	}
-
-	return 0;
+	return solve(in_file, 10);
 }
 }        // namespace
 
