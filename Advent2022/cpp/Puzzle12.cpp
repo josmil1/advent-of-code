@@ -71,9 +71,8 @@ Grid get_grid(std::ifstream &in_file, uint64_t *start_key, uint64_t *end_key)
 				}
 				else if ('S' == c)
 				{
-					c                         = min_elevation;
-					*start_key                = key(x, y);
-					new_pos.shortest_distance = 0;
+					c          = min_elevation;
+					*start_key = key(x, y);
 				}
 				new_pos.x         = x;
 				new_pos.y         = y;
@@ -96,7 +95,7 @@ uint64_t min_distance(std::vector<uint64_t> *keys_to_visit, Grid &grid)
 	for (size_t i = 0; i < keys_to_visit->size(); i++)
 	{
 		auto distance = grid[keys_to_visit->at(i)].shortest_distance;
-		if (distance <= min_distance)
+		if (distance < min_distance)
 		{
 			min_distance    = distance;
 			min_distance_it = i;
@@ -111,11 +110,10 @@ uint64_t min_distance(std::vector<uint64_t> *keys_to_visit, Grid &grid)
 	return min_distance_key;
 }
 
-uint64_t puzzle_12_1(std::ifstream &in_file)
+void dijkstra(Grid &grid, uint64_t start_key)
 {
-	uint64_t start_key, end_key;
-	int32_t  max_x{0}, max_y{0};
-	Grid     grid = get_grid(in_file, &start_key, &end_key);
+	int32_t max_x{0}, max_y{0};
+	grid[start_key].shortest_distance = 0;
 
 	// Dijkstra’s Algorithm
 	std::vector<uint64_t> keys_to_visit;
@@ -140,7 +138,8 @@ uint64_t puzzle_12_1(std::ifstream &in_file)
 					{
 						auto &neighbor = grid[neighbor_key];
 						if (!neighbor.visited &&
-						    (neighbor.elevation < pos.elevation || neighbor.elevation - pos.elevation <= 1))
+						    (pos.elevation - neighbor.elevation <= 1))        // Part 2
+						//(neighbor.elevation < pos.elevation || neighbor.elevation - pos.elevation <= 1))        // Part 1
 						{
 							neighbor.shortest_distance = std::min(neighbor.shortest_distance, pos.shortest_distance + 1);
 							keys_to_visit.push_back(neighbor_key);
@@ -170,26 +169,42 @@ uint64_t puzzle_12_1(std::ifstream &in_file)
 		keys_to_visit_count = keys_to_visit.size();
 	}
 
+	print(grid, max_x, max_y);
+}
+
+uint64_t puzzle_12_1(std::ifstream &in_file)
+{
+	uint64_t start_key, end_key;
+	Grid     grid = get_grid(in_file, &start_key, &end_key);
+
+	dijkstra(grid, start_key);
+
 	return grid[end_key].shortest_distance;
 }
 
 uint64_t puzzle_12_2(std::ifstream &in_file)
 {
-	std::string line;
+	uint64_t start_key, end_key;
+	Grid     grid = get_grid(in_file, &start_key, &end_key);
 
-	while (std::getline(in_file, line))
+	start_key = end_key;
+
+	dijkstra(grid, start_key);
+
+	uint32_t min_distance = std::numeric_limits<uint32_t>::max();
+	for (auto &it : grid)
 	{
-		if (line.size() > 0)
+		if (it.second.elevation == 0 && it.second.shortest_distance < min_distance)
 		{
-			std::cout << line << std::endl;
+			min_distance = it.second.shortest_distance;
 		}
 	}
 
-	return 0;
+	return min_distance;
 }
 }        // namespace
 
 uint64_t puzzle_12(std::ifstream &in_file)
 {
-	return puzzle_12_1(in_file);
+	return puzzle_12_2(in_file);
 }
