@@ -15,7 +15,7 @@ struct Pos
 using Grid = std::unordered_map<uint64_t, Pos>;
 inline uint64_t key(int32_t x, int32_t y)
 {
-	return static_cast<uint64_t>(x) << 32 | static_cast<uint32_t>(y);
+	return static_cast<uint64_t>(x) << 32 | static_cast<uint64_t>(y);
 }
 
 void print(Grid &grid, uint32_t max_x, uint32_t max_y)
@@ -27,14 +27,13 @@ void print(Grid &grid, uint32_t max_x, uint32_t max_y)
 			auto &node = grid[key(i, j)];
 			if (node.visited)
 			{
-				std::cout << "v";
-				std::cout << grid[key(i, j)].shortest_distance << " ";
+				std::cout << grid[key(i, j)].shortest_distance;
 			}
 			else
 			{
 				std::cout << ".";
 			}
-			// std::cout << char(grid[key(i, j)].elevation + 'a') << " ";
+			std::cout << char(grid[key(i, j)].elevation + 'a') << "\t";
 		}
 		std::cout << std::endl;
 	}
@@ -95,7 +94,7 @@ uint64_t min_distance(std::vector<uint64_t> *keys_to_visit, Grid &grid)
 	for (size_t i = 0; i < keys_to_visit->size(); i++)
 	{
 		auto distance = grid[keys_to_visit->at(i)].shortest_distance;
-		if (distance < min_distance)
+		if (distance <= min_distance)
 		{
 			min_distance    = distance;
 			min_distance_it = i;
@@ -110,7 +109,7 @@ uint64_t min_distance(std::vector<uint64_t> *keys_to_visit, Grid &grid)
 	return min_distance_key;
 }
 
-void dijkstra(Grid &grid, uint64_t start_key)
+void dijkstra(Grid &grid, uint64_t start_key, bool part_1)
 {
 	int32_t max_x{0}, max_y{0};
 	grid[start_key].shortest_distance = 0;
@@ -137,9 +136,9 @@ void dijkstra(Grid &grid, uint64_t start_key)
 					if (grid.count(neighbor_key) > 0)
 					{
 						auto &neighbor = grid[neighbor_key];
-						if (!neighbor.visited &&
-						    (pos.elevation - neighbor.elevation <= 1))        // Part 2
-						//(neighbor.elevation < pos.elevation || neighbor.elevation - pos.elevation <= 1))        // Part 1
+						auto  can_move = part_1 ? (neighbor.elevation < pos.elevation || neighbor.elevation - pos.elevation <= 1) :
+						                          (neighbor.elevation > pos.elevation || pos.elevation - neighbor.elevation <= 1);
+						if (!neighbor.visited && can_move)
 						{
 							neighbor.shortest_distance = std::min(neighbor.shortest_distance, pos.shortest_distance + 1);
 							keys_to_visit.push_back(neighbor_key);
@@ -177,7 +176,7 @@ uint64_t puzzle_12_1(std::ifstream &in_file)
 	uint64_t start_key, end_key;
 	Grid     grid = get_grid(in_file, &start_key, &end_key);
 
-	dijkstra(grid, start_key);
+	dijkstra(grid, start_key, true);
 
 	return grid[end_key].shortest_distance;
 }
@@ -187,10 +186,13 @@ uint64_t puzzle_12_2(std::ifstream &in_file)
 	uint64_t start_key, end_key;
 	Grid     grid = get_grid(in_file, &start_key, &end_key);
 
-	start_key = end_key;
+	// Run backwards, from end to all possible start positions
+	grid[start_key].shortest_distance = std::numeric_limits<uint32_t>::max();
+	start_key                         = end_key;
 
-	dijkstra(grid, start_key);
+	dijkstra(grid, start_key, false);
 
+	// Find closest start position
 	uint32_t min_distance = std::numeric_limits<uint32_t>::max();
 	for (auto &it : grid)
 	{
@@ -206,5 +208,5 @@ uint64_t puzzle_12_2(std::ifstream &in_file)
 
 uint64_t puzzle_12(std::ifstream &in_file)
 {
-	return puzzle_12_2(in_file);
+	return puzzle_12_1(in_file);
 }
