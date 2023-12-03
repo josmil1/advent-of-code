@@ -120,14 +120,12 @@ uint64_t puzzle_03_1(std::ifstream &in_file)
 				if (std::isdigit(element[0]))
 				{
 					// Number, check if it has a symbol around it
-					// std::cout << "(" << i << ", " << j << "): " << std::stol(element) << ": ";
 					for (int32_t x = i - 1; x <= static_cast<int32_t>(i + element.size()); x++)
 					{
 						for (int32_t y = j - 1; y <= j + 1; y++)
 						{
 							if (!(x == i && y == j) && grid.count(key(x, y)))        // Avoid detecting itself
 							{
-								// std::cout << grid[key(x, y)] << " ";
 								if (!std::isdigit(grid[key(x, y)][0]))        // Avoid detecting another number
 								{
 									sum += std::stol(element);
@@ -135,7 +133,6 @@ uint64_t puzzle_03_1(std::ifstream &in_file)
 							}
 						}
 					}
-					// std::cout << std::endl;
 				}
 			}
 		}
@@ -146,21 +143,62 @@ uint64_t puzzle_03_1(std::ifstream &in_file)
 
 uint64_t puzzle_03_2(std::ifstream &in_file)
 {
-	std::string line;
+	uint64_t height{0}, width{0};
+	auto     grid = parse_grid(in_file, height, width);
+	uint64_t sum{0};
 
-	while (std::getline(in_file, line))
+	for (int32_t j = 0; j < height; j++)
 	{
-		if (line.size() > 0)
+		for (int32_t i = 0; i < width; i++)
 		{
-			std::cout << line << std::endl;
+			auto grid_key = key(i, j);
+			if (grid.count(grid_key))
+			{
+				if (grid[grid_key] == "*")
+				{
+					// Gear, check if it has a number around it
+					int      number_count{0};
+					uint64_t gear_ratio{1};
+
+					for (int32_t x = 0; x < width; x++)
+					{
+						for (int32_t y = j - 1; y <= j + 1; y++)
+						{
+							if (grid.count(key(x, y)))
+							{
+								auto &element = grid[key(x, y)];
+								if (std::isdigit(element[0]))
+								{
+									// Consider a long number that spans above/below the gear
+									auto number_size = static_cast<int32_t>(element.size());
+									if ((x >= (i - 1) && x <= (i + 1)) || (x <= (i - 1) && x + number_size >= i))
+									{
+										number_count++;
+										gear_ratio *= std::stol(element);
+									}
+								}
+							}
+						}
+					}
+
+					// A gear is any * symbol that is adjacent to exactly two part numbers
+					if (2 == number_count)
+					{
+						// Its gear ratio is the result of multiplying those two numbers together
+						sum += gear_ratio;
+						gear_ratio = 1;
+					}
+				}
+			}
 		}
 	}
 
-	return 0;
+	// Return the sum of all of the gear ratios in the engine schematic
+	return sum;
 }
 }        // namespace
 
 uint64_t puzzle_03(std::ifstream &in_file)
 {
-	return puzzle_03_1(in_file);
+	return puzzle_03_2(in_file);
 }
