@@ -2,19 +2,54 @@
 
 namespace
 {
+struct Mapping
+{
+	uint64_t src{0};
+	uint64_t dst{0};
+	uint64_t range{0};
+};
+
+class SeedMap
+{
+  public:
+	inline void add_range(uint64_t src, uint64_t dst, uint64_t range)
+	{
+		mappings.push_back({src, dst, range});
+	}
+
+	uint64_t get(uint64_t input)
+	{
+		uint64_t output = input;
+
+		for (auto &mapping : mappings)
+		{
+			if (input >= mapping.src && input <= mapping.src + mapping.range)
+			{
+				output = mapping.dst + (input - mapping.src);
+				break;
+			}
+		}
+
+		return output;
+	}
+
+  private:
+	std::vector<Mapping> mappings;
+};
+
 using Seedmap = std::unordered_map<uint64_t, uint64_t>;
 
 std::vector<uint64_t> seeds;
 
-Seedmap seedToSoil;
-Seedmap soilToFertilizer;
-Seedmap fertilizerToWater;
-Seedmap waterToLight;
-Seedmap lightToTemperature;
-Seedmap temperatureToHumidity;
-Seedmap humidityToLocation;
+SeedMap seedToSoil;
+SeedMap soilToFertilizer;
+SeedMap fertilizerToWater;
+SeedMap waterToLight;
+SeedMap lightToTemperature;
+SeedMap temperatureToHumidity;
+SeedMap humidityToLocation;
 
-inline void parse_map(std::ifstream &in_file, Seedmap &seed_map)
+inline void parse_map(std::ifstream &in_file, SeedMap &seed_map)
 {
 	std::string line;
 	uint64_t    num;
@@ -27,24 +62,13 @@ inline void parse_map(std::ifstream &in_file, Seedmap &seed_map)
 		uint64_t src{0}, dst{0}, range{0};
 		ss >> dst >> src >> range;
 
-		for (uint64_t i = 0; i < range; i++)
-		{
-			seed_map[src + i] = dst + i;
-		}
+		seed_map.add_range(src, dst, range);
 	}
 }
 
 void parse_maps(std::ifstream &in_file)
 {
 	seeds.clear();
-
-	seedToSoil.clear();
-	soilToFertilizer.clear();
-	fertilizerToWater.clear();
-	waterToLight.clear();
-	lightToTemperature.clear();
-	temperatureToHumidity.clear();
-	humidityToLocation.clear();
 
 	std::string line;
 	std::string str;
@@ -82,13 +106,13 @@ uint64_t puzzle_05_1(std::ifstream &in_file)
 
 	for (auto &seed : seeds)
 	{
-		auto soil        = seedToSoil.count(seed) ? seedToSoil[seed] : seed;
-		auto fertilizer  = soilToFertilizer.count(soil) ? soilToFertilizer[soil] : soil;
-		auto water       = fertilizerToWater.count(fertilizer) ? fertilizerToWater[fertilizer] : fertilizer;
-		auto light       = waterToLight.count(water) ? waterToLight[water] : water;
-		auto temperature = lightToTemperature.count(light) ? lightToTemperature[light] : light;
-		auto humidity    = temperatureToHumidity.count(temperature) ? temperatureToHumidity[temperature] : temperature;
-		auto location    = humidityToLocation.count(humidity) ? humidityToLocation[humidity] : humidity;
+		auto soil        = seedToSoil.get(seed);
+		auto fertilizer  = soilToFertilizer.get(soil);
+		auto water       = fertilizerToWater.get(fertilizer);
+		auto light       = waterToLight.get(water);
+		auto temperature = lightToTemperature.get(light);
+		auto humidity    = temperatureToHumidity.get(temperature);
+		auto location    = humidityToLocation.get(humidity);
 
 		lowest_location = std::min(lowest_location, location);
 	}
