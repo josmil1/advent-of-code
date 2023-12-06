@@ -4,8 +4,8 @@ namespace
 {
 struct Race
 {
-	uint32_t time;
-	uint32_t distance;
+	uint64_t time;
+	uint64_t distance;
 };
 
 std::vector<Race> parse_races(std::ifstream &in_file)
@@ -88,20 +88,52 @@ uint64_t puzzle_06_1(std::ifstream &in_file)
 uint64_t puzzle_06_2(std::ifstream &in_file)
 {
 	std::string line;
+	std::string str;
 
-	while (std::getline(in_file, line))
+	// Single race
+	Race race{};
+
+	// Time
 	{
-		if (line.size() > 0)
+		std::getline(in_file, line);
+		std::stringstream ss(line);
+		std::string       num_string{""};
+
+		// "Time:"
+		ss >> str;
+
+		// x	y	z
+		while (ss >> str)
 		{
-			std::cout << line << std::endl;
+			num_string += str;
 		}
+
+		race.time = std::stol(num_string);
 	}
 
-	return 0;
+	// Distance
+	{
+		std::getline(in_file, line);
+		std::stringstream ss(line);
+		std::string       num_string{""};
+
+		// "Distance:"
+		ss >> str;
+
+		// x	y	z
+		while (ss >> str)
+		{
+			num_string += str;
+		}
+
+		race.distance = std::stol(num_string);
+	}
+
+	return get_ways_to_win(race);
 }
 }        // namespace
 
 uint64_t puzzle_06(std::ifstream &in_file)
 {
-	return puzzle_06_1(in_file);
+	return puzzle_06_2(in_file);
 }
