@@ -2,6 +2,8 @@
 
 namespace
 {
+bool USE_JOKERS{false};
+
 enum HandType : uint16_t
 {
 	Unknown   = 7,
@@ -14,7 +16,7 @@ enum HandType : uint16_t
 	HighCard  = 0         // All 5 cards' labels are distinct
 };
 
-const std::unordered_map<char, uint16_t> card_values{
+std::unordered_map<char, uint16_t> card_values{
     {'A', 13},
     {'K', 12},
     {'Q', 11},
@@ -51,24 +53,31 @@ struct Hand
 		}
 		else if (2 == counts.size())
 		{
-			auto it         = counts.begin();
-			auto first_size = it->second;
-			std::advance(it, 1);
-			auto second_size = it->second;
-
-			auto count_diff = std::abs(static_cast<int16_t>(first_size) - second_size);
-
-			if (3 == count_diff)
+			if (USE_JOKERS && counts.count('J') > 0)
 			{
-				type = FourKind;
-			}
-			else if (1 == count_diff)
-			{
-				type = FullHouse;
+				type = FiveKind;
 			}
 			else
 			{
-				type = Unknown;
+				auto it         = counts.begin();
+				auto first_size = it->second;
+				std::advance(it, 1);
+				auto second_size = it->second;
+
+				auto count_diff = std::abs(static_cast<int16_t>(first_size) - second_size);
+
+				if (3 == count_diff)
+				{
+					type = FourKind;
+				}
+				else if (1 == count_diff)
+				{
+					type = FullHouse;
+				}
+				else
+				{
+					type = Unknown;
+				}
 			}
 		}
 		else if (3 == counts.size())
@@ -77,23 +86,58 @@ struct Hand
 			{
 				if (it.second == 3)
 				{
-					type = ThreeKind;
+					if (USE_JOKERS && counts.count('J') > 0)
+					{
+						type = FourKind;
+					}
+					else
+					{
+						type = ThreeKind;
+					}
 					break;
 				}
 				else if (it.second == 2)
 				{
-					type = TwoPair;
+					if (USE_JOKERS && counts.count('J') > 0)
+					{
+						if (counts['J'] == 1)
+						{
+							type = FullHouse;
+						}
+						else
+						{
+							type = FourKind;
+						}
+					}
+					else
+					{
+						type = TwoPair;
+					}
 					break;
 				}
 			}
 		}
 		else if (4 == counts.size())
 		{
-			type = OnePair;
+			if (USE_JOKERS && counts.count('J') > 0)
+			{
+				type = ThreeKind;
+			}
+			else
+			{
+				type = OnePair;
+			}
 		}
 		else
 		{
-			type = HighCard;
+			if (USE_JOKERS && counts.count('J') > 0)
+			{
+				type = OnePair;
+			}
+			else
+			{
+				type = HighCard;
+			}
 		}
 	}
 
@@ -101,6 +145,11 @@ struct Hand
 	{
 		if (type == other.type)
 		{
+			if (USE_JOKERS)
+			{
+				card_values['J'] = 0;
+			}
+
 			for (int i = 0; i < cards.size(); i++)
 			{
 				char this_card  = cards[i];
@@ -153,14 +202,6 @@ uint64_t puzzle_07_1(std::ifstream &in_file)
 
 	auto hands = parse_hands(in_file);
 
-	for (auto &h : hands)
-	{
-		if (h.type < 0 || h.type > 7)
-		{
-			std::cout << h.cards << " " << h.type << std::endl;
-		}
-	}
-
 	std::stable_sort(hands.begin(), hands.end());
 
 	for (int i = 0; i < hands.size(); i++)
@@ -173,21 +214,13 @@ uint64_t puzzle_07_1(std::ifstream &in_file)
 
 uint64_t puzzle_07_2(std::ifstream &in_file)
 {
-	std::string line;
+	USE_JOKERS = true;
 
-	while (std::getline(in_file, line))
-	{
-		if (line.size() > 0)
-		{
-			std::cout << line << std::endl;
-		}
-	}
-
-	return 0;
+	return puzzle_07_1(in_file);
 }
 }        // namespace
 
 uint64_t puzzle_07(std::ifstream &in_file)
 {
-	return puzzle_07_1(in_file);
+	return puzzle_07_2(in_file);
 }
