@@ -155,40 +155,6 @@ uint64_t puzzle_08_2(std::ifstream &in_file)
 	}
 
 	return lcm_vector(steps);
-	/*
-	while (true)
-	{
-	    auto current_index = step_index % sequence.size();
-	    char current_step  = sequence[current_index];
-
-	    bool stop = true;
-
-	    for (uint64_t i = 0; i < start_locations.size(); i++)
-	    {
-	        auto l = start_locations[i];
-
-	        auto current_options = locations[l];
-
-	        if ('R' == current_step)
-	        {
-	            start_locations[i] = current_options.right;
-	        }
-	        else
-	        {
-	            start_locations[i] = current_options.left;
-	        }
-
-	        stop &= ('Z' == start_locations[i][2]);
-	    }
-
-	    step_index++;
-
-	    if (stop)
-	    {
-	        break;
-	    }
-	}
-	*/
 }
 }        // namespace
 
