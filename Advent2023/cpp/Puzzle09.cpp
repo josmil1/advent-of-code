@@ -28,7 +28,7 @@ int64_t get_previous_value(Sequence &seq)
 	}
 }
 
-int64_t get_last_value(Sequence &seq, int64_t last_value)
+int64_t get_last_value(Sequence &seq)
 {
 	std::set<int64_t> unique_values(seq.begin(), seq.end());
 
@@ -41,11 +41,11 @@ int64_t get_last_value(Sequence &seq, int64_t last_value)
 			reduction.push_back(diff);
 		}
 
-		return get_last_value(reduction, seq.back() + last_value);
+		return seq.back() + get_last_value(reduction);
 	}
 	else
 	{
-		return seq.back() + last_value;
+		return seq.back();
 	}
 }
 
@@ -83,7 +83,7 @@ uint64_t puzzle_09_1(std::ifstream &in_file)
 
 	for (auto &h : histories)
 	{
-		sum += get_last_value(h, 0);
+		sum += get_last_value(h);
 	}
 
 	return sum;
