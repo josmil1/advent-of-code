@@ -4,6 +4,8 @@
 
 namespace
 {
+bool PART_TWO{false};
+
 struct Pos
 {
 	int32_t x{0};
@@ -232,22 +234,44 @@ uint64_t puzzle_10_1(std::ifstream &in_file)
 		}
 	}
 
-	return max_distance;
+	uint64_t inside{0};
+	for (uint64_t y = 0; y < line_count; y++)
+	{
+		uint64_t south_count{0};
+		for (uint64_t x = 0; x < line_width; x++)
+		{
+			// Any tile that isn't part of the main loop can count as being enclosed by the loop.
+			if (grid.count(key(x, y)))
+			{
+				auto &node = grid[key(x, y)];
+
+				if (node.visited && node.south)
+				{
+					south_count++;
+				}
+				else if (!node.visited && south_count % 2 != 0)
+				{
+					inside++;
+				}
+			}
+			else
+			{
+				if (south_count % 2 != 0)
+				{
+					inside++;
+				}
+			}
+		}
+	}
+
+	return PART_TWO ? inside : max_distance;
 }
 
 uint64_t puzzle_10_2(std::ifstream &in_file)
 {
-	std::string line;
+	PART_TWO = true;
 
-	while (std::getline(in_file, line))
-	{
-		if (line.size() > 0)
-		{
-			std::cout << line << std::endl;
-		}
-	}
-
-	return 0;
+	return puzzle_10_1(in_file);
 }
 }        // namespace
 
