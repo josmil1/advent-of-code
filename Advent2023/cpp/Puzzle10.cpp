@@ -19,9 +19,9 @@ struct Node
 	bool east{false};
 	bool west{false};
 
-	Pos      pos;
-	uint64_t start_distance;
-	bool     visited;
+	Pos     pos;
+	int64_t distance;
+	bool    visited;
 };
 
 using Grid = std::unordered_map<uint64_t, Node>;
@@ -31,10 +31,15 @@ inline uint64_t key(int32_t x, int32_t y)
 	return static_cast<uint64_t>(x) << 32 | static_cast<uint32_t>(y);
 }
 
+inline uint64_t key(Pos &pos)
+{
+	return key(pos.x, pos.y);
+}
+
 uint64_t puzzle_10_1(std::ifstream &in_file)
 {
 	Grid        grid;
-	uint64_t    line_count{0}, line_width{0};
+	int32_t     height{0}, width{0};
 	std::string line;
 
 	Pos start;
@@ -47,68 +52,66 @@ uint64_t puzzle_10_1(std::ifstream &in_file)
 			for (int x = 0; x < line.size(); x++)
 			{
 				Node node{};
-				node.pos.x = x;
-				node.pos.y = line_count;
+				node.pos = {x, height};
 
 				switch (line[x])
 				{
-					case 'S':
+					case 'S':        // Start position
 					{
-						start.x = x;
-						start.y = line_count;
+						start = node.pos;
 
-						grid[key(x, line_count)] = node;
+						grid[key(node.pos)] = node;
 						break;
 					}
-					case '|':        // A vertical pipe connecting north and south.
+					case '|':        // A vertical pipe connecting north and south
 					{
 						node.north = true;
 						node.south = true;
 
-						grid[key(x, line_count)] = node;
+						grid[key(node.pos)] = node;
 						break;
 					}
-					case '-':        // A horizontal pipe connecting east and west.
+					case '-':        // A horizontal pipe connecting east and west
 					{
 						node.east = true;
 						node.west = true;
 
-						grid[key(x, line_count)] = node;
+						grid[key(node.pos)] = node;
 						break;
 					}
-					case 'L':        // A 90-degree bend connecting north and east.
+					case 'L':        // A 90-degree bend connecting north and east
 					{
 						node.north = true;
 						node.east  = true;
 
-						grid[key(x, line_count)] = node;
+						grid[key(node.pos)] = node;
 						break;
 					}
-					case 'J':        // A 90-degree bend connecting north and west.
+					case 'J':        // A 90-degree bend connecting north and west
 					{
 						node.north = true;
 						node.west  = true;
 
-						grid[key(x, line_count)] = node;
+						grid[key(x, height)] = node;
 						break;
 					}
-					case '7':        // A 90-degree bend connecting south and west.
+					case '7':        // A 90-degree bend connecting south and west
 					{
 						node.south = true;
 						node.west  = true;
 
-						grid[key(x, line_count)] = node;
+						grid[key(x, height)] = node;
 						break;
 					}
-					case 'F':        // A 90-degree bend connecting south and east.
+					case 'F':        // A 90-degree bend connecting south and east
 					{
 						node.south = true;
 						node.east  = true;
 
-						grid[key(x, line_count)] = node;
+						grid[key(x, height)] = node;
 						break;
 					}
-					case '.':        // Ground; there is no pipe in this tile.
+					case '.':        // Ground; there is no pipe in this tile
 					{
 						break;
 					}
@@ -120,16 +123,16 @@ uint64_t puzzle_10_1(std::ifstream &in_file)
 				}
 			}
 
-			line_count++;
-			if (0 == line_width)
+			height++;
+			if (0 == width)
 			{
-				line_width = line.size();
+				width = line.size();
 			}
 		}
 	}
 
 	// Determine pipe in start position
-	auto &start_node = grid[key(start.x, start.y)];
+	auto &start_node = grid[key(start)];
 
 	if (start.x > 0)
 	{
@@ -138,7 +141,7 @@ uint64_t puzzle_10_1(std::ifstream &in_file)
 		start_node.west = west_node.east;
 	}
 
-	if (start.x < line_width - 1)
+	if (start.x < width - 1)
 	{
 		auto &east_node = grid[key(start.x + 1, start.y)];
 
@@ -152,119 +155,99 @@ uint64_t puzzle_10_1(std::ifstream &in_file)
 		start_node.north = north_node.south;
 	}
 
-	if (start.y < line_count - 1)
+	if (start.y < height - 1)
 	{
 		auto &south_node = grid[key(start.x, start.y + 1)];
 
 		start_node.south = south_node.north;
 	}
 
-	// Traverse map and record farthest distance from Start
-	struct NodeTracker
-	{
-		Pos      pos;
-		uint64_t distance;
-	};
-	std::deque<NodeTracker> nodes_to_visit;
+	// Part 1: traverse map and record farthest distance from Start
+	std::deque<Node *> nodes_to_visit;
 
-	if (start_node.west)
-	{
-		nodes_to_visit.push_back({{start.x - 1, start.y}, 0});
-	}
-	if (start_node.east)
-	{
-		nodes_to_visit.push_back({{start.x + 1, start.y}, 0});
-	}
-	if (start_node.north)
-	{
-		nodes_to_visit.push_back({{start.x, start.y - 1}, 0});
-	}
-	if (start_node.south)
-	{
-		nodes_to_visit.push_back({{start.x, start.y + 1}, 0});
-	}
+	nodes_to_visit.push_back(&start_node);
 
-	start_node.visited = true;
+	int64_t max_distance{0};
 
-	uint64_t max_distance{0};
-	while (true)
+	do
 	{
-		auto node_tracker = nodes_to_visit.front();
+		auto &current_node = nodes_to_visit.front();
+
+		if (!current_node->visited)
+		{
+			current_node->visited = true;
+
+			max_distance = std::max(max_distance, current_node->distance);
+
+			if (current_node->west)
+			{
+				auto &next_node = grid[key(current_node->pos.x - 1, current_node->pos.y)];
+
+				next_node.distance = current_node->distance + 1;
+
+				nodes_to_visit.push_back(&next_node);
+			}
+			if (current_node->east)
+			{
+				auto &next_node = grid[key(current_node->pos.x + 1, current_node->pos.y)];
+
+				next_node.distance = current_node->distance + 1;
+
+				nodes_to_visit.push_back(&next_node);
+			}
+			if (current_node->north)
+			{
+				auto &next_node = grid[key(current_node->pos.x, current_node->pos.y - 1)];
+
+				next_node.distance = current_node->distance + 1;
+
+				nodes_to_visit.push_back(&next_node);
+			}
+			if (current_node->south)
+			{
+				auto &next_node = grid[key(current_node->pos.x, current_node->pos.y + 1)];
+
+				next_node.distance = current_node->distance + 1;
+
+				nodes_to_visit.push_back(&next_node);
+			}
+		}
+
 		nodes_to_visit.pop_front();
+	} while (!nodes_to_visit.empty());
 
-		auto &node = grid[key(node_tracker.pos.x, node_tracker.pos.y)];
-
-		if (!node.visited)
-		{
-			node.start_distance = node_tracker.distance + 1;
-
-			max_distance = std::max(max_distance, node.start_distance);
-
-			// std::cout << "(" << node.pos.x << ", " << node.pos.y << "): " << node.start_distance << std::endl;
-
-			if (node.west)
-			{
-				nodes_to_visit.push_back({{node.pos.x - 1, node.pos.y}, node.start_distance});
-				// std::cout << "go west ";
-			}
-			if (node.east)
-			{
-				nodes_to_visit.push_back({{node.pos.x + 1, node.pos.y}, node.start_distance});
-				// std::cout << "go east ";
-			}
-			if (node.north)
-			{
-				nodes_to_visit.push_back({{node.pos.x, node.pos.y - 1}, node.start_distance});
-				// std::cout << "go north ";
-			}
-			if (node.south)
-			{
-				nodes_to_visit.push_back({{node.pos.x, node.pos.y + 1}, node.start_distance});
-				// std::cout << "go south ";
-			}
-
-			// std::cout << std::endl;
-
-			node.visited = true;
-		}
-
-		if (nodes_to_visit.empty())
-		{
-			break;
-		}
-	}
-
-	uint64_t inside{0};
-	for (uint64_t y = 0; y < line_count; y++)
+	// Part 2: count tiles enclosed by the loop
+	uint64_t enclosed{0};
+	for (uint64_t y = 0; y < height; y++)
 	{
+		// Any tile that isn't part of the main loop can count as being enclosed by the loop
+		// For each such tile, count all loop pipes to its left that have a south (or north) connection
+		// Explanation: https://en.wikipedia.org/wiki/Even–odd_rule
+		// Visualization: https://imgur.com/a/ukstWKO
 		uint64_t south_count{0};
-		for (uint64_t x = 0; x < line_width; x++)
+		for (uint64_t x = 0; x < width; x++)
 		{
-			// Any tile that isn't part of the main loop can count as being enclosed by the loop.
-			if (grid.count(key(x, y)))
+			if (grid.count(key(x, y)) && grid[key(x, y)].visited)
 			{
-				auto &node = grid[key(x, y)];
-
-				if (node.visited && node.south)
+				// Part of the main loop
+				if (grid[key(x, y)].south)
 				{
 					south_count++;
-				}
-				else if (!node.visited && south_count % 2 != 0)
-				{
-					inside++;
 				}
 			}
 			else
 			{
+				// Not part of the main loop
 				if (south_count % 2 != 0)
 				{
-					inside++;
+					// Number of south connecting pipes to the left is odd
+					enclosed++;
 				}
 			}
 		}
 	}
 
-	return PART_TWO ? inside : max_distance;
+	return PART_TWO ? enclosed : max_distance;
 }
 
 uint64_t puzzle_10_2(std::ifstream &in_file)
@@ -277,5 +260,5 @@ uint64_t puzzle_10_2(std::ifstream &in_file)
 
 uint64_t puzzle_10(std::ifstream &in_file)
 {
-	return puzzle_10_1(in_file);
+	return puzzle_10_2(in_file);
 }
