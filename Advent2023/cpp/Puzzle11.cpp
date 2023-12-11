@@ -4,6 +4,8 @@
 
 namespace
 {
+uint32_t EXPANSION_FACTOR{2};
+
 struct Pos
 {
 	uint32_t x;
@@ -63,7 +65,7 @@ uint64_t puzzle_11_1(std::ifstream &in_file)
 			uint32_t empty_rows = distance_y - std::abs(std::distance(galaxy_rows.begin(), std::find(galaxy_rows.begin(), galaxy_rows.end(), galaxies[i].y)) -
 			                                            std::distance(galaxy_rows.begin(), std::find(galaxy_rows.begin(), galaxy_rows.end(), galaxies[j].y)));
 
-			uint64_t distance = distance_x + distance_y + empty_columns + empty_rows;
+			uint64_t distance = distance_x + distance_y + (EXPANSION_FACTOR - 1) * (empty_columns + empty_rows);
 
 			sum += distance;
 		}
@@ -74,21 +76,13 @@ uint64_t puzzle_11_1(std::ifstream &in_file)
 
 uint64_t puzzle_11_2(std::ifstream &in_file)
 {
-	std::string line;
+	EXPANSION_FACTOR = 1000000;
 
-	while (std::getline(in_file, line))
-	{
-		if (line.size() > 0)
-		{
-			std::cout << line << std::endl;
-		}
-	}
-
-	return 0;
+	return puzzle_11_1(in_file);
 }
 }        // namespace
 
 uint64_t puzzle_11(std::ifstream &in_file)
 {
-	return puzzle_11_1(in_file);
+	return puzzle_11_2(in_file);
 }
