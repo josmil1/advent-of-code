@@ -2,6 +2,8 @@
 
 namespace
 {
+constexpr uint32_t UNFOLD_FACTOR = 5;
+
 using Record = std::pair<std::string, std::vector<uint32_t>>;
 
 uint64_t get_arrangement_count(Record &record, uint32_t cur_size = 0)
@@ -78,7 +80,7 @@ uint64_t get_arrangement_count(Record &record, uint32_t cur_size = 0)
 	return 0;
 }
 
-uint64_t puzzle_12_1(std::ifstream &in_file)
+std::vector<Record> parse_records(std::ifstream &in_file)
 {
 	std::string line;
 
@@ -97,12 +99,7 @@ uint64_t puzzle_12_1(std::ifstream &in_file)
 			std::stringstream ss(line);
 
 			// Springs
-			ss >> str;
-
-			// Ensure all # groups terminate with '.'
-			// since we evaluate arrangement correctness
-			// when reaching these delimiters
-			new_record.first = str + ".";
+			ss >> new_record.first;
 
 			// Sizes
 			ss >> str;
@@ -119,10 +116,22 @@ uint64_t puzzle_12_1(std::ifstream &in_file)
 		}
 	}
 
+	return records;
+}
+
+uint64_t puzzle_12_1(std::ifstream &in_file)
+{
+	auto records = parse_records(in_file);
+
 	uint64_t sum{0};
 
 	for (auto &record : records)
 	{
+		// Ensure all # groups terminate with '.'
+		// since we evaluate arrangement correctness
+		// when reaching these delimiters
+		record.first += ".";
+
 		sum += get_arrangement_count(record);
 	}
 
@@ -131,21 +140,36 @@ uint64_t puzzle_12_1(std::ifstream &in_file)
 
 uint64_t puzzle_12_2(std::ifstream &in_file)
 {
-	std::string line;
+	auto records = parse_records(in_file);
 
-	while (!in_file.eof())
+	uint64_t sum{0};
+
+	for (auto &record : records)
 	{
-		while (std::getline(in_file, line))
+		Record unfolded;
+		unfolded.second.reserve(UNFOLD_FACTOR * record.second.size());
+		for (uint32_t i = 0; i < UNFOLD_FACTOR; i++)
 		{
-			std::cout << line << std::endl;
+			unfolded.first += record.first;
+			if (i < UNFOLD_FACTOR - 1)
+			{
+				unfolded.first += "?";
+			}
+			else
+			{
+				unfolded.first += ".";
+			}
+			unfolded.second.insert(unfolded.second.end(), record.second.begin(), record.second.end());
 		}
+
+		sum += get_arrangement_count(unfolded);
 	}
 
-	return 0;
+	return sum;
 }
 }        // namespace
 
 uint64_t puzzle_12(std::ifstream &in_file)
 {
-	return puzzle_12_1(in_file);
+	return puzzle_12_2(in_file);
 }
