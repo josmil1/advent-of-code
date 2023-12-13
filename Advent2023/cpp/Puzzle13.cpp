@@ -47,23 +47,18 @@ void print(Pattern &pattern)
 	}
 }
 
-uint64_t get_reflection_score(Pattern &pattern)
+uint64_t get_reflection_score(Pattern &pattern, uint32_t smudges = 0)
 {
-	std::cout << "Pattern: " << std::endl;
-	print(pattern);
-
 	// Find column of reflection
 	uint32_t reflection_column{0};
 	for (uint32_t i = 1; i < pattern.width; i++)
 	{
-		// std::cout << "check between columns " << i - 1 << " and " << i << std::endl;
-		uint32_t d{0};
+		uint32_t d{0}, smudge_count{0};
 		bool     reflection{true};
 		while (d < pattern.width - i)
 		{
 			int32_t i_left  = static_cast<int32_t>(i) - 1 - d;
 			int32_t i_right = i + d;
-			// std::cout << "check up to " << d << " columns away, columns " << i_left << " and " << i_right << std::endl;
 			for (uint32_t j = 0; j < pattern.height; j++)
 			{
 				if (i_left >= 0 && i_right < pattern.width)
@@ -71,9 +66,10 @@ uint64_t get_reflection_score(Pattern &pattern)
 					bool both_empty  = !pattern.grid.count(key(i_left, j)) && !pattern.grid.count(key(i_right, j));
 					bool both_mirror = pattern.grid.count(key(i_left, j)) && pattern.grid.count(key(i_right, j));
 					reflection &= (both_empty || both_mirror);
-					if (reflection)
+					if (!reflection && smudge_count < smudges)
 					{
-						// std::cout << pattern.grid.count(key(i_left, j)) << " && " << pattern.grid.count(key(i_right, j)) << std::endl;
+						reflection = true;
+						smudge_count++;
 					}
 				}
 			}
@@ -88,7 +84,7 @@ uint64_t get_reflection_score(Pattern &pattern)
 			}
 		}
 
-		if (reflection)
+		if (reflection && smudge_count == smudges)
 		{
 			reflection_column = i;
 			break;
@@ -104,14 +100,12 @@ uint64_t get_reflection_score(Pattern &pattern)
 	uint32_t reflection_row{0};
 	for (uint32_t j = 1; j < pattern.height; j++)
 	{
-		// std::cout << "check between rows " << j - 1 << " and " << j << std::endl;
-		uint32_t d{0};
+		uint32_t d{0}, smudge_count{0};
 		bool     reflection{true};
 		while (d < pattern.height - j)
 		{
 			int32_t j_above = static_cast<int32_t>(j) - 1 - d;
 			int32_t j_below = j + d;
-			// std::cout << "check up to " << d << " rows away, rows " << j_above << " and " << j_below << std::endl;
 			for (uint32_t i = 0; i < pattern.width; i++)
 			{
 				if (j_above >= 0 && j_below < pattern.height)
@@ -119,9 +113,10 @@ uint64_t get_reflection_score(Pattern &pattern)
 					bool both_empty  = !pattern.grid.count(key(i, j_above)) && !pattern.grid.count(key(i, j_below));
 					bool both_mirror = pattern.grid.count(key(i, j_above)) && pattern.grid.count(key(i, j_below));
 					reflection &= (both_empty || both_mirror);
-					if (reflection)
+					if (!reflection && smudge_count < smudges)
 					{
-						// std::cout << pattern.grid.count(key(i, j_above)) << " && " << pattern.grid.count(key(i, j_below)) << std::endl;
+						reflection = true;
+						smudge_count++;
 					}
 				}
 			}
@@ -136,7 +131,7 @@ uint64_t get_reflection_score(Pattern &pattern)
 			}
 		}
 
-		if (reflection)
+		if (reflection && smudge_count == smudges)
 		{
 			reflection_row = j;
 			break;
@@ -146,15 +141,13 @@ uint64_t get_reflection_score(Pattern &pattern)
 	return reflection_row * 100;
 }
 
-uint64_t puzzle_13_1(std::ifstream &in_file)
+std::vector<Pattern> parse_patterns(std::ifstream &in_file)
 {
-	uint64_t sum{0};
+	std::vector<Pattern> patterns;
 
 	std::string line;
-
-	std::vector<Pattern> patterns;
-	Grid                 grid;
-	uint32_t             width{0}, height{0};
+	Grid        grid;
+	uint32_t    width{0}, height{0};
 
 	while (std::getline(in_file, line))
 	{
@@ -187,11 +180,19 @@ uint64_t puzzle_13_1(std::ifstream &in_file)
 		}
 	}
 
-	for (auto &p : patterns)
-	{
-		auto reflection_score = get_reflection_score(p);
+	return patterns;
+}
 
-		std::cout << reflection_score << std::endl;
+uint64_t puzzle_13_1(std::ifstream &in_file)
+{
+	uint64_t sum{0};
+
+	auto patterns = parse_patterns(in_file);
+
+	for (auto &pattern : patterns)
+	{
+		auto reflection_score = get_reflection_score(pattern);
+
 		sum += reflection_score;
 	}
 
@@ -200,21 +201,22 @@ uint64_t puzzle_13_1(std::ifstream &in_file)
 
 uint64_t puzzle_13_2(std::ifstream &in_file)
 {
-	std::string line;
+	uint64_t sum{0};
 
-	while (std::getline(in_file, line))
+	auto patterns = parse_patterns(in_file);
+
+	for (auto &pattern : patterns)
 	{
-		if (line.size() > 0)
-		{
-			std::cout << line << std::endl;
-		}
+		auto reflection_score = get_reflection_score(pattern, 1);
+
+		sum += reflection_score;
 	}
 
-	return 0;
+	return sum;
 }
 }        // namespace
 
 uint64_t puzzle_13(std::ifstream &in_file)
 {
-	return puzzle_13_1(in_file);
+	return puzzle_13_2(in_file);
 }
