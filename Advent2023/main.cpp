@@ -7,7 +7,7 @@
 
 #include "Puzzles.hpp"
 
-#define DAY 12
+#define DAY 13
 
 #define STR_INDIR(x) #x
 #define STR(x) STR_INDIR(x)
