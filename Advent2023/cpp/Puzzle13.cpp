@@ -47,27 +47,40 @@ void print(Pattern &pattern)
 	}
 }
 
-uint64_t get_reflection_score(Pattern &pattern, uint32_t smudges = 0)
+uint64_t find_reflection_line(Pattern &pattern, bool transpose = false, uint32_t smudges = 0)
 {
-	// Find column of reflection
-	uint32_t reflection_column{0};
-	for (uint32_t i = 1; i < pattern.width; i++)
+	uint32_t reflection_line{0};
+
+	auto width  = transpose ? pattern.height : pattern.width;
+	auto height = transpose ? pattern.width : pattern.height;
+
+	for (uint32_t i = 1; i < width; i++)
 	{
-		uint32_t d{0}, smudge_count{0};
+		// Check between columns/rows i - 1 and i
+		uint32_t smudge_count{0};
 		bool     reflection{true};
-		while (d < pattern.width - i)
+		uint32_t d{0};        // Distance from reflection line
+		while (d < width - i)
 		{
-			int32_t i_left  = static_cast<int32_t>(i) - 1 - d;
-			int32_t i_right = i + d;
-			for (uint32_t j = 0; j < pattern.height; j++)
+			// Check up to d columns/rows away
+			for (uint32_t j = 0; j < height; j++)
 			{
-				if (i_left >= 0 && i_right < pattern.width)
+				int32_t i_left  = transpose ? j : static_cast<int32_t>(i) - 1 - d;
+				int32_t i_right = transpose ? j : i + d;
+
+				int32_t j_above = transpose ? static_cast<int32_t>(i) - 1 - d : j;
+				int32_t j_below = transpose ? i + d : j;
+
+				// Assume reflection is valid if going out of bounds on one side
+				bool check_reflection = transpose ? (j_above >= 0 && j_below < width) : (i_left >= 0 && i_right < width);
+				if (check_reflection)
 				{
-					bool both_empty  = !pattern.grid.count(key(i_left, j)) && !pattern.grid.count(key(i_right, j));
-					bool both_mirror = pattern.grid.count(key(i_left, j)) && pattern.grid.count(key(i_right, j));
+					bool both_empty  = !pattern.grid.count(key(i_left, j_above)) && !pattern.grid.count(key(i_right, j_below));
+					bool both_mirror = pattern.grid.count(key(i_left, j_above)) && pattern.grid.count(key(i_right, j_below));
 					reflection &= (both_empty || both_mirror);
 					if (!reflection && smudge_count < smudges)
 					{
+						// Allow for smudges, reflection still valid
 						reflection = true;
 						smudge_count++;
 					}
@@ -76,67 +89,40 @@ uint64_t get_reflection_score(Pattern &pattern, uint32_t smudges = 0)
 
 			if (reflection)
 			{
+				// Column/rows at either side are the same
+				// check those one step further away
 				d++;
 			}
 			else
 			{
+				// No reflection across this line
+				// check next line
 				break;
 			}
 		}
 
 		if (reflection && smudge_count == smudges)
 		{
-			reflection_column = i;
+			// Columns/rows at either side all match,
+			// with correct ammount of smudges, line found
+			reflection_line = i;
 			break;
 		}
 	}
+
+	return reflection_line;
+}
+
+uint64_t get_reflection_score(Pattern &pattern, uint32_t smudges = 0)
+{
+	auto reflection_column = find_reflection_line(pattern, false, smudges);
 
 	if (reflection_column > 0)
 	{
 		return reflection_column;
 	}
 
-	// Find row of reflection
-	uint32_t reflection_row{0};
-	for (uint32_t j = 1; j < pattern.height; j++)
-	{
-		uint32_t d{0}, smudge_count{0};
-		bool     reflection{true};
-		while (d < pattern.height - j)
-		{
-			int32_t j_above = static_cast<int32_t>(j) - 1 - d;
-			int32_t j_below = j + d;
-			for (uint32_t i = 0; i < pattern.width; i++)
-			{
-				if (j_above >= 0 && j_below < pattern.height)
-				{
-					bool both_empty  = !pattern.grid.count(key(i, j_above)) && !pattern.grid.count(key(i, j_below));
-					bool both_mirror = pattern.grid.count(key(i, j_above)) && pattern.grid.count(key(i, j_below));
-					reflection &= (both_empty || both_mirror);
-					if (!reflection && smudge_count < smudges)
-					{
-						reflection = true;
-						smudge_count++;
-					}
-				}
-			}
-
-			if (reflection)
-			{
-				d++;
-			}
-			else
-			{
-				break;
-			}
-		}
-
-		if (reflection && smudge_count == smudges)
-		{
-			reflection_row = j;
-			break;
-		}
-	}
+	auto reflection_row = find_reflection_line(pattern, true, smudges);
 
 	return reflection_row * 100;
 }
