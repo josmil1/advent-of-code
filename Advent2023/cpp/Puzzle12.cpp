@@ -6,78 +6,72 @@ constexpr uint32_t UNFOLD_FACTOR = 5;
 
 using Record = std::pair<std::string, std::vector<uint32_t>>;
 
-uint64_t get_arrangement_count(Record &record, uint32_t cur_size = 0)
+inline uint64_t key(uint32_t a, uint32_t b, uint32_t c)
 {
+	return static_cast<uint64_t>(a) << 20 | static_cast<uint64_t>(b) << 10 | c;
+}
+
+using Cache = std::unordered_map<uint64_t, uint64_t>;
+
+Cache cache{};
+
+uint64_t get_arrangement_count(Record &record, uint32_t i_springs = 0, uint32_t i_sizes = 0, uint32_t cur_size = 0)
+{
+	uint64_t ret{0};
+
 	auto &springs = record.first;
 	auto &sizes   = record.second;
 
-	for (size_t i = 0; i < springs.size(); i++)
+	uint64_t cache_key = key(i_springs, i_sizes, cur_size);
+	if (cache.count(cache_key))
 	{
-		switch (springs[i])
+		return cache[cache_key];
+	}
+
+	if (i_springs == springs.size())
+	{
+		// Reached the end of the springs
+		if (i_sizes == sizes.size() && cur_size == 0)
 		{
-			case '.':
-			{
-				if (0 == cur_size)
-				{
-					// No group of broken springs started
-					continue;
-				}
-				else if (cur_size == sizes[0])
-				{
-					// Reached the max number of broken springs in this group
-					if (sizes.size() > 1)
-					{
-						// There are more groups
-						// Keep counting arrangements for rest of record
-						Record remaining_record;
-						remaining_record.first  = springs.substr(i + 1);
-						remaining_record.second = std::vector<uint32_t>(sizes.begin() + 1, sizes.end());
-
-						return get_arrangement_count(remaining_record);
-					}
-					else
-					{
-						// If there are any more broken springs, this arrangement is incorrect
-						// Otherwise this is the 1 correct arrangement
-						bool more_broken = springs.substr(i + 1).find('#') != std::string::npos;
-						return more_broken ? 0 : 1;
-					}
-				}
-
-				// Group ended but size is incorrect
-				// This arrangement is not valid, stop here
-				return 0;
-			}
-			case '#':
-			{
-				cur_size++;
-				break;
-			}
-			case '?':
-			{
-				// So far the arrangement is valid, but now there is a branching
-				// path of possible arrangements, add count for both
-				Record remaining_record_option_1;
-				remaining_record_option_1.first  = "." + springs.substr(i + 1);
-				remaining_record_option_1.second = sizes;
-
-				Record remaining_record_option_2;
-				remaining_record_option_2.first  = "#" + springs.substr(i + 1);
-				remaining_record_option_2.second = sizes;
-
-				return get_arrangement_count(remaining_record_option_1, cur_size) +
-				       get_arrangement_count(remaining_record_option_2, cur_size);
-			}
-			default:
-			{
-				std::cout << "Error: unhandled char " << springs[i] << std::endl;
-				break;
-			}
+			// No more pending groups, arrangement correct
+			return 1;
+		}
+		else if (i_sizes == sizes.size() - 1 && sizes[i_sizes] == cur_size)
+		{
+			// Last pending group of broken springs matches expected size,
+			// arrangement correct
+			return 1;
+		}
+		else
+		{
+			// Otherwise this arrangement is incorrect
+			return 0;
 		}
 	}
 
-	// Finished counting arrangements, only trailing '.' remain
-	return 0;
+	if ('.' == springs[i_springs] || '?' == springs[i_springs])
+	{
+		if (0 == cur_size)
+		{
+			// Calculate arrangements assuming no group of broken springs started
+			ret += get_arrangement_count(record, i_springs + 1, i_sizes, 0);
+		}
+		else if (cur_size > 0 && i_sizes < sizes.size() && cur_size == sizes[i_sizes])
+		{
+			// Reached the max number of broken springs in this group
+			// There are more groups, keep counting arrangements for rest of record
+			ret += get_arrangement_count(record, i_springs + 1, i_sizes + 1, 0);
+		}
+	}
+
+	if ('#' == springs[i_springs] || '?' == springs[i_springs])
+	{
+		// Calculate arrangements assuming current group is correct and growing
+		ret += get_arrangement_count(record, i_springs + 1, i_sizes, cur_size + 1);
+	}
+
+	cache[cache_key] = ret;
+	return ret;
 }
 
 std::vector<Record> parse_records(std::ifstream &in_file)
@@ -127,12 +121,9 @@ uint64_t puzzle_12_1(std::ifstream &in_file)
 
 	for (auto &record : records)
 	{
-		// Ensure all # groups terminate with '.'
-		// since we evaluate arrangement correctness
-		// when reaching these delimiters
-		record.first += ".";
-
 		sum += get_arrangement_count(record);
+
+		cache.clear();
 	}
 
 	return sum;
@@ -155,14 +146,13 @@ uint64_t puzzle_12_2(std::ifstream &in_file)
 			{
 				unfolded.first += "?";
 			}
-			else
-			{
-				unfolded.first += ".";
-			}
+
 			unfolded.second.insert(unfolded.second.end(), record.second.begin(), record.second.end());
 		}
 
 		sum += get_arrangement_count(unfolded);
+
+		cache.clear();
 	}
 
 	return sum;
