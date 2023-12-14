@@ -1,6 +1,6 @@
 //
 //  Puzzles.hpp
-//  Advent2022
+//  Advent2023
 //
 
 #ifndef Puzzles_hpp
@@ -28,5 +28,6 @@ uint64_t puzzle_10(std::ifstream &in_file);
 uint64_t puzzle_11(std::ifstream &in_file);
 uint64_t puzzle_12(std::ifstream &in_file);
 uint64_t puzzle_13(std::ifstream &in_file);
+uint64_t puzzle_14(std::ifstream &in_file);
 
 #endif /* Puzzles_hpp */
