@@ -92,155 +92,6 @@ Platform get_platform(std::ifstream &in_file)
 	return platform;
 }
 
-uint64_t puzzle_14_1(std::ifstream &in_file)
-{
-	uint64_t load{0};
-
-	auto platform = get_platform(in_file);
-
-	// Tilt north and calculate load
-	// Count round rocks from the top until a square rock is found
-	Platform after_north_tilt = platform;
-	after_north_tilt.grid.clear();
-	for (uint32_t i = 0; i < platform.width; i++)
-	{
-		uint64_t column_load{0};
-		uint32_t round_count{0};
-		uint32_t square_height{0};
-		// Rocks are 0-indexed, but load depends on row count
-		for (uint32_t j = 0; j < platform.height; j++)
-		{
-			if (platform.grid.count(key(i, j)))
-			{
-				auto &r = platform.grid[key(i, j)];
-
-				Rock new_rock;
-				new_rock.round = r.round;
-
-				if (r.round)
-				{
-					new_rock.pos = Pos{i, round_count + square_height};
-
-					column_load += (platform.height - square_height - round_count);
-					round_count++;
-				}
-				else
-				{
-					new_rock.pos = Pos{i, j};
-
-					square_height = j + 1;
-					round_count   = 0;
-				}
-
-				after_north_tilt.grid[key(new_rock.pos.x, new_rock.pos.y)] = new_rock;
-			}
-		}
-
-		load += column_load;
-	}
-
-	print(after_north_tilt);
-
-	// Rotate clockwise, then tilt north
-	Platform after_west_tilt;
-	for (uint32_t i = 0; i < after_north_tilt.width; i++)
-	{
-		for (uint32_t j = 0; j < after_north_tilt.height; j++)
-		{
-			if (after_north_tilt.grid.count(key(i, j)))
-			{
-				Pos new_pos{after_north_tilt.height - 1 - j, i};
-				after_west_tilt.grid[key(new_pos.x, new_pos.y)] = after_north_tilt.grid[key(i, j)];
-
-				after_west_tilt.grid[key(new_pos.x, new_pos.y)].pos = new_pos;
-			}
-		}
-	}
-
-	std::cout << "------------------" << std::endl;
-	after_west_tilt.width  = after_north_tilt.height;
-	after_west_tilt.height = after_north_tilt.width;
-	print(after_west_tilt);
-
-	/*
-	Grid after_west_tilt;
-	platform = after_north_tilt;
-	for (uint32_t j = 0; j < height; j++)
-	{
-	    uint32_t round_count{0};
-	    uint32_t square_height{0};
-	    for (uint32_t i = 0; i < width; i++)
-	    {
-	        if (platform.count(key(i, j)))
-	        {
-	            auto &r = platform[key(i, j)];
-
-	            Rock new_rock;
-	            new_rock.round = r.round;
-
-	            if (r.round)
-	            {
-	                new_rock.pos = Pos{round_count + square_height, j};
-
-	                round_count++;
-	            }
-	            else
-	            {
-	                new_rock.pos = Pos{i, j};
-
-	                square_height = i + 1;
-	                round_count   = 0;
-	            }
-
-	            after_west_tilt[key(new_rock.pos.x, new_rock.pos.y)] = new_rock;
-	        }
-	    }
-	}
-
-	std::cout << "------------------" << std::endl;
-	print(after_west_tilt, width, height);
-
-	Grid after_south_tilt;
-	platform = after_west_tilt;
-	for (uint32_t i = 0; i < width; i++)
-	{
-	    uint32_t round_count{0};
-	    uint32_t square_height{0};
-	    for (uint32_t j = 0; j < height; j++)
-	    {
-	        if (platform.count(key(width - 1 - i, height - 1 - j)))
-	        {
-	            auto &r = platform[key(width - 1 - i, height - 1 - j)];
-
-	            Rock new_rock;
-	            new_rock.round = r.round;
-
-	            if (r.round)
-	            {
-	                new_rock.pos = Pos{width - 1 - i, height - 1 - (round_count + square_height)};
-
-	                round_count++;
-	            }
-	            else
-	            {
-	                new_rock.pos = Pos{width - 1 - i, height - 1 - j};
-
-	                square_height = height - 1 - (j + 1);
-	                round_count   = 0;
-	            }
-
-	            after_south_tilt[key(new_rock.pos.x, new_rock.pos.y)] = new_rock;
-	        }
-	    }
-	}
-
-	std::cout << "------------------" << std::endl;
-	print(after_south_tilt, width, height);
-	*/
-
-	return load;
-}
-
 Platform tilt_north(Platform &platform)
 {
 	Platform after_tilt = platform;
@@ -352,36 +203,58 @@ uint64_t get_north_beam_load(Platform &platform)
 	return load;
 }
 
+uint64_t puzzle_14_1(std::ifstream &in_file)
+{
+	auto platform = get_platform(in_file);
+
+	platform = tilt_north(platform);
+
+	return get_north_beam_load(platform);
+}
+
 uint64_t puzzle_14_2(std::ifstream &in_file)
 {
 	auto platform = get_platform(in_file);
 
-	for (uint32_t i = 0; i < 1000000000; i++)
+	constexpr uint32_t MIN_CYCLES = 100;
+	constexpr uint32_t MAX_CYCLES = 1000000000;
+
+	std::unordered_map<uint64_t, uint32_t> load_counts;
+
+	std::vector<uint64_t> load_list;
+	load_list.reserve(MIN_CYCLES);
+
+	// Expect the loads to repeat after MIN_CYCLES,
+	// at least a few times within as many cycles
+	for (uint32_t i = 0; i < MIN_CYCLES * 2; i++)
 	{
-		platform = cycle(platform);
+		platform  = cycle(platform);
+		auto load = get_north_beam_load(platform);
+
+		if (i >= MIN_CYCLES)
+		{
+			load_counts[load]++;
+			load_list.push_back(load);
+		}
 	}
-	print(platform);
 
-	/*
-	print(platform);
+	// Find loop size (length of repeating sequence)
+	uint32_t loop_size{0};
+	uint32_t min_load_count{std::numeric_limits<uint32_t>::max()};
+	for (auto &lc : load_counts)
+	{
+		min_load_count = std::min(min_load_count, lc.second);
+	}
+	for (auto &lc : load_counts)
+	{
+		lc.second = lc.second / min_load_count;
+		loop_size += lc.second;
+	}
 
-	platform = tilt_north(platform);
+	// Find which load within the repeating sequence will remain after MAX_CYCLES
+	uint32_t index = ((MAX_CYCLES - MIN_CYCLES) % loop_size) - 1;
 
-	std::cout << "------------------" << std::endl;
-	print(platform);
-
-	platform = rotate_clockwise(platform);
-
-	std::cout << "------------------" << std::endl;
-	print(platform);
-
-	platform = tilt_north(platform);
-
-	std::cout << "------------------" << std::endl;
-	print(platform);
-	*/
-
-	return get_north_beam_load(platform);
+	return load_list[index];
 }
 }        // namespace
 
