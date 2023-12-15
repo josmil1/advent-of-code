@@ -29,5 +29,6 @@ uint64_t puzzle_11(std::ifstream &in_file);
 uint64_t puzzle_12(std::ifstream &in_file);
 uint64_t puzzle_13(std::ifstream &in_file);
 uint64_t puzzle_14(std::ifstream &in_file);
+uint64_t puzzle_15(std::ifstream &in_file);
 
 #endif /* Puzzles_hpp */
