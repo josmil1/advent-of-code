@@ -8,8 +8,7 @@ uint32_t get_hash(std::string str)
 
 	for (auto &c : str)
 	{
-		// Determine the ASCII code for the current character of the string.
-		// Increase the current value by the ASCII code you just determined.
+		// Increase the current value by the ASCII code for the current character.
 		hash += static_cast<int>(c);
 
 		// Set the current value to itself multiplied by 17.
@@ -61,11 +60,15 @@ uint64_t get_focusing_power(std::unordered_map<uint32_t, std::vector<Lens>> &box
 		for (uint32_t i = 0; i < lenses.size(); i++)
 		{
 			uint64_t power{1};
+
 			// The focusing power of a single lens is the result of multiplying together:
+
 			// 1 + the box number of the lens in question.
 			power *= (1 + box.first);
+
 			// The slot number of the lens within the box: 1 for the first lens, 2 for the second lens, and so on.
 			power *= (1 + i);
+
 			// The focal length of the lens.
 			power *= lenses[i].focal_length;
 
@@ -78,12 +81,11 @@ uint64_t get_focusing_power(std::unordered_map<uint32_t, std::vector<Lens>> &box
 
 uint64_t puzzle_15_2(std::ifstream &in_file)
 {
-	uint64_t sum{0};
+	std::unordered_map<uint32_t, std::vector<Lens>> boxes;
 
 	std::string line;
 
-	std::unordered_map<uint32_t, std::vector<Lens>> boxes;
-
+	// Parse and execute operations
 	while (std::getline(in_file, line))
 	{
 		if (line.size() > 0)
@@ -95,27 +97,30 @@ uint64_t puzzle_15_2(std::ifstream &in_file)
 				{
 					case '=':
 					{
-						// std::cout << "Add " << str << " " << line[i + 1] << " to Box #" << get_hash(str) << std::endl;
-
+						auto     box          = get_hash(str);
 						uint32_t focal_length = line[i + 1] - '0';
 
-						auto box = get_hash(str);
-
+						// Add lens with label str to Box #box
 						if (boxes.count(box))
 						{
 							auto it = std::find_if(boxes[box].begin(), boxes[box].end(), [&](Lens const &l) { return l.label == str; });
 
 							if (it != boxes[box].end())
 							{
+								// If there is already a lens in the box with the same label,
+								// replace the old lens with the new lens
 								it->focal_length = focal_length;
 							}
 							else
 							{
+								// If there is not already a lens in the box with the same label,
+								// add the lens to the box immediately behind any lenses already in the box
 								boxes[box].push_back({str, focal_length});
 							}
 						}
 						else
 						{
+							// First lens in this box
 							boxes[box].push_back({str, focal_length});
 						}
 
@@ -123,16 +128,16 @@ uint64_t puzzle_15_2(std::ifstream &in_file)
 					}
 					case '-':
 					{
-						// std::cout << "Remove " << str << " from Box #" << get_hash(str) << std::endl;
-
 						auto box = get_hash(str);
 
+						// Remove lens with label str from Box #box
 						if (boxes.count(box))
 						{
 							auto it = std::find_if(boxes[box].begin(), boxes[box].end(), [&](Lens const &l) { return l.label == str; });
 
 							if (it != boxes[box].end())
 							{
+								// Remove the lens with the given label if it is present in the box
 								boxes[box].erase(it);
 							}
 						}
@@ -140,11 +145,13 @@ uint64_t puzzle_15_2(std::ifstream &in_file)
 					}
 					case ',':
 					{
+						// New lens and operation
 						str.clear();
 						break;
 					}
 					default:
 					{
+						// Parse label
 						str += line[i];
 						break;
 					}
