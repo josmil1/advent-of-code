@@ -151,291 +151,323 @@ uint64_t puzzle_16_1(std::ifstream &in_file)
 	*/
 
 	// Path trace
-	std::vector<LightBeam> beams;
-	beams.push_back({Direction::Right, {0, 0}});
+	uint32_t max_energy{0};
 
-	while (!beams.empty())
+	std::vector<LightBeam> start_beams;
+
+	for (int i = 0; i < width; i++)
 	{
-		auto beam = beams.back();
-		beams.pop_back();
-
-		Pos cur = beam.start;
-
-		while (cur.x >= 0 && cur.x < width && cur.y >= 0 && cur.y < height)
-		{
-			if (!grid.count(key(cur.x, cur.y)))
-			{
-				grid[key(cur.x, cur.y)] = {SpaceType::Empty};
-			}
-
-			auto &space = grid[key(cur.x, cur.y)];
-
-			// Break early if already done this path before
-			bool break_early{false};
-			switch (beam.dir)
-			{
-				case Direction::Right:
-				{
-					break_early = space.visited_right;
-					break;
-				}
-				case Direction::Down:
-				{
-					break_early = space.visited_down;
-					break;
-				}
-				case Direction::Left:
-				{
-					break_early = space.visited_left;
-					break;
-				}
-				case Direction::Up:
-				{
-					break_early = space.visited_up;
-					break;
-				}
-				default:
-				{
-					std::cout << "Error" << std::endl;
-				}
-			}
-
-			if (break_early)
-			{
-				break;
-			}
-
-			switch (beam.dir)
-			{
-				case Direction::Right:
-				{
-					space.visited_right = true;
-					break;
-				}
-				case Direction::Down:
-				{
-					space.visited_down = true;
-					break;
-				}
-				case Direction::Left:
-				{
-					space.visited_left = true;
-					break;
-				}
-				case Direction::Up:
-				{
-					space.visited_up = true;
-					break;
-				}
-				default:
-				{
-					std::cout << "Error" << std::endl;
-				}
-			}
-
-			// Process space
-			switch (space.type)
-			{
-				case SpaceType::Empty:
-				{
-					break;
-				}
-				case SpaceType::MirrorBack:
-				{
-					switch (beam.dir)
-					{
-						case Direction::Right:
-						{
-							beam.dir = Direction::Down;
-							break;
-						}
-						case Direction::Down:
-						{
-							beam.dir = Direction::Right;
-							break;
-						}
-						case Direction::Left:
-						{
-							beam.dir = Direction::Up;
-							break;
-						}
-						case Direction::Up:
-						{
-							beam.dir = Direction::Left;
-							break;
-						}
-						default:
-						{
-							std::cout << "Error" << std::endl;
-						}
-					}
-					break;
-				}
-				case SpaceType::MirrorForward:
-				{
-					switch (beam.dir)
-					{
-						case Direction::Right:
-						{
-							beam.dir = Direction::Up;
-							break;
-						}
-						case Direction::Down:
-						{
-							beam.dir = Direction::Left;
-							break;
-						}
-						case Direction::Left:
-						{
-							beam.dir = Direction::Down;
-							break;
-						}
-						case Direction::Up:
-						{
-							beam.dir = Direction::Right;
-							break;
-						}
-						default:
-						{
-							std::cout << "Error" << std::endl;
-						}
-					}
-					break;
-				}
-				case SpaceType::SplitterH:
-				{
-					switch (beam.dir)
-					{
-						case Direction::Right:
-						case Direction::Left:
-						{
-							break;
-						}
-						case Direction::Up:
-						{
-							beam.dir = Direction::Right;
-
-							beams.push_back({Direction::Left, {cur.x - 1, cur.y}});
-							break;
-						}
-						case Direction::Down:
-						{
-							beam.dir = Direction::Right;
-
-							beams.push_back({Direction::Left, {cur.x - 1, cur.y}});
-							break;
-						}
-						default:
-						{
-							std::cout << "Error" << std::endl;
-						}
-					}
-					break;
-				}
-				case SpaceType::SplitterV:
-				{
-					switch (beam.dir)
-					{
-						case Direction::Up:
-						case Direction::Down:
-						{
-							break;
-						}
-						case Direction::Right:
-						{
-							beam.dir = Direction::Up;
-
-							beams.push_back({Direction::Down, {cur.x, cur.y + 1}});
-							break;
-						}
-						case Direction::Left:
-						{
-							beam.dir = Direction::Up;
-
-							beams.push_back({Direction::Down, {cur.x, cur.y + 1}});
-							break;
-						}
-						default:
-						{
-							std::cout << "Error" << std::endl;
-						}
-					}
-					break;
-				}
-				default:
-				{
-					std::cout << "Error" << std::endl;
-				}
-			}
-
-			// Move beam
-			switch (beam.dir)
-			{
-				case Direction::Right:
-				{
-					cur.x++;
-					break;
-				}
-				case Direction::Down:
-				{
-					cur.y++;
-					break;
-				}
-				case Direction::Left:
-				{
-					cur.x--;
-					break;
-				}
-				case Direction::Up:
-				{
-					cur.y--;
-					break;
-				}
-				default:
-				{
-					std::cout << "Error" << std::endl;
-				}
-			}
-		}
+		start_beams.push_back({Direction::Down, {i, 0}});
 	}
-
-	uint32_t visited_count{0};
-
-	for (auto &s : grid)
+	for (int i = 0; i < width; i++)
 	{
-		if (s.second.visited_left || s.second.visited_right || s.second.visited_down || s.second.visited_up)
-		{
-			visited_count++;
-		}
+		start_beams.push_back({Direction::Up, {i, static_cast<int>(height) - 1}});
 	}
-
-	/*
 	for (int j = 0; j < height; j++)
 	{
-	    for (int i = 0; i < width; i++)
-	    {
-	        if (grid.count(key(i, j)))
-	        {
-	            auto &s = grid[key(i, j)];
-	            if (s.visited_left || s.visited_right || s.visited_down || s.visited_up)
-	            {
-	                std::cout << "#";
-	            }
-	            else
-	            {
-	                std::cout << ".";
-	            }
-	        }
-	        else
-	        {
-	            std::cout << ".";
-	        }
-	    }
-	    std::cout << std::endl;
+		start_beams.push_back({Direction::Right, {0, j}});
 	}
-	*/
+	for (int j = 0; j < height; j++)
+	{
+		start_beams.push_back({Direction::Left, {static_cast<int>(width) - 1, j}});
+	}
 
-	return visited_count;
+	while (!start_beams.empty())
+	{
+		auto sbeam = start_beams.back();
+		start_beams.pop_back();
+
+		auto this_grid = grid;
+
+		std::vector<LightBeam> beams;
+		beams.push_back({sbeam.dir, sbeam.start});
+
+		while (!beams.empty())
+		{
+			auto beam = beams.back();
+			beams.pop_back();
+
+			Pos cur = beam.start;
+
+			while (cur.x >= 0 && cur.x < width && cur.y >= 0 && cur.y < height)
+			{
+				if (!this_grid.count(key(cur.x, cur.y)))
+				{
+					this_grid[key(cur.x, cur.y)] = {SpaceType::Empty};
+				}
+
+				auto &space = this_grid[key(cur.x, cur.y)];
+
+				// Break early if already done this path before
+				bool break_early{false};
+				switch (beam.dir)
+				{
+					case Direction::Right:
+					{
+						break_early = space.visited_right;
+						break;
+					}
+					case Direction::Down:
+					{
+						break_early = space.visited_down;
+						break;
+					}
+					case Direction::Left:
+					{
+						break_early = space.visited_left;
+						break;
+					}
+					case Direction::Up:
+					{
+						break_early = space.visited_up;
+						break;
+					}
+					default:
+					{
+						std::cout << "Error" << std::endl;
+					}
+				}
+
+				if (break_early)
+				{
+					break;
+				}
+
+				switch (beam.dir)
+				{
+					case Direction::Right:
+					{
+						space.visited_right = true;
+						break;
+					}
+					case Direction::Down:
+					{
+						space.visited_down = true;
+						break;
+					}
+					case Direction::Left:
+					{
+						space.visited_left = true;
+						break;
+					}
+					case Direction::Up:
+					{
+						space.visited_up = true;
+						break;
+					}
+					default:
+					{
+						std::cout << "Error" << std::endl;
+					}
+				}
+
+				// Process space
+				switch (space.type)
+				{
+					case SpaceType::Empty:
+					{
+						break;
+					}
+					case SpaceType::MirrorBack:
+					{
+						switch (beam.dir)
+						{
+							case Direction::Right:
+							{
+								beam.dir = Direction::Down;
+								break;
+							}
+							case Direction::Down:
+							{
+								beam.dir = Direction::Right;
+								break;
+							}
+							case Direction::Left:
+							{
+								beam.dir = Direction::Up;
+								break;
+							}
+							case Direction::Up:
+							{
+								beam.dir = Direction::Left;
+								break;
+							}
+							default:
+							{
+								std::cout << "Error" << std::endl;
+							}
+						}
+						break;
+					}
+					case SpaceType::MirrorForward:
+					{
+						switch (beam.dir)
+						{
+							case Direction::Right:
+							{
+								beam.dir = Direction::Up;
+								break;
+							}
+							case Direction::Down:
+							{
+								beam.dir = Direction::Left;
+								break;
+							}
+							case Direction::Left:
+							{
+								beam.dir = Direction::Down;
+								break;
+							}
+							case Direction::Up:
+							{
+								beam.dir = Direction::Right;
+								break;
+							}
+							default:
+							{
+								std::cout << "Error" << std::endl;
+							}
+						}
+						break;
+					}
+					case SpaceType::SplitterH:
+					{
+						switch (beam.dir)
+						{
+							case Direction::Right:
+							case Direction::Left:
+							{
+								break;
+							}
+							case Direction::Up:
+							{
+								beam.dir = Direction::Right;
+
+								beams.push_back({Direction::Left, {cur.x - 1, cur.y}});
+								break;
+							}
+							case Direction::Down:
+							{
+								beam.dir = Direction::Right;
+
+								beams.push_back({Direction::Left, {cur.x - 1, cur.y}});
+								break;
+							}
+							default:
+							{
+								std::cout << "Error" << std::endl;
+							}
+						}
+						break;
+					}
+					case SpaceType::SplitterV:
+					{
+						switch (beam.dir)
+						{
+							case Direction::Up:
+							case Direction::Down:
+							{
+								break;
+							}
+							case Direction::Right:
+							{
+								beam.dir = Direction::Up;
+
+								beams.push_back({Direction::Down, {cur.x, cur.y + 1}});
+								break;
+							}
+							case Direction::Left:
+							{
+								beam.dir = Direction::Up;
+
+								beams.push_back({Direction::Down, {cur.x, cur.y + 1}});
+								break;
+							}
+							default:
+							{
+								std::cout << "Error" << std::endl;
+							}
+						}
+						break;
+					}
+					default:
+					{
+						std::cout << "Error" << std::endl;
+					}
+				}
+
+				// Move beam
+				switch (beam.dir)
+				{
+					case Direction::Right:
+					{
+						cur.x++;
+						break;
+					}
+					case Direction::Down:
+					{
+						cur.y++;
+						break;
+					}
+					case Direction::Left:
+					{
+						cur.x--;
+						break;
+					}
+					case Direction::Up:
+					{
+						cur.y--;
+						break;
+					}
+					default:
+					{
+						std::cout << "Error" << std::endl;
+					}
+				}
+			}
+
+			uint32_t visited_count{0};
+
+			for (auto &s : this_grid)
+			{
+				if (s.second.visited_left || s.second.visited_right || s.second.visited_down || s.second.visited_up)
+				{
+					visited_count++;
+				}
+			}
+
+			// std::cout << visited_count << std::endl;
+			max_energy = std::max(max_energy, visited_count);
+
+			/*
+			for (int j = 0; j < height; j++)
+			{
+			    for (int i = 0; i < width; i++)
+			    {
+			        if (this_grid.count(key(i, j)))
+			        {
+			            auto &s = this_grid[key(i, j)];
+			            if (s.visited_left || s.visited_right || s.visited_down || s.visited_up)
+			            {
+			                std::cout << "#";
+			            }
+			            else
+			            {
+			                std::cout << ".";
+			            }
+			        }
+			        else
+			        {
+			            std::cout << ".";
+			        }
+			    }
+			    std::cout << std::endl;
+			}
+			*/
+		}
+	}
+
+	return max_energy;
 }
 
 uint64_t puzzle_16_2(std::ifstream &in_file)
