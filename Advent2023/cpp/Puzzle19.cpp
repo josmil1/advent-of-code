@@ -18,7 +18,7 @@ struct Rule
 	std::string destination{};
 };
 
-using Workflows = std::unordered_map<std::string, std::vector<Rule>>;
+using Workflow = std::vector<Rule>;
 
 struct Part
 {
@@ -27,6 +27,10 @@ struct Part
 	uint32_t a{0};
 	uint32_t s{0};
 };
+
+const std::string START    = "in";
+const std::string ACCEPTED = "A";
+const std::string REJECTED = "R";
 
 std::string remove_string_before(std::string &str, char del)
 {
@@ -42,12 +46,9 @@ std::string remove_string_before(std::string &str, char del)
 	return ret;
 }
 
-uint64_t puzzle_19_1(std::ifstream &in_file)
+void parse_input(std::ifstream &in_file, std::unordered_map<std::string, Workflow> &workflows, std::vector<Part> &parts)
 {
 	std::string line;
-
-	Workflows         flows;
-	std::vector<Part> parts;
 
 	while (std::getline(in_file, line))
 	{
@@ -55,7 +56,7 @@ uint64_t puzzle_19_1(std::ifstream &in_file)
 		{
 			if ('{' == line[0])
 			{
-				// Part
+				// Parse part
 				Part p{};
 
 				uint32_t    num{};
@@ -81,7 +82,7 @@ uint64_t puzzle_19_1(std::ifstream &in_file)
 			}
 			else
 			{
-				// Workflow
+				// Parse workflow
 				std::string       flow_name;
 				std::vector<Rule> rules;
 
@@ -146,21 +147,29 @@ uint64_t puzzle_19_1(std::ifstream &in_file)
 					}
 				}
 
-				flows[flow_name] = rules;
+				workflows[flow_name] = rules;
 			}
 		}
 	}
+}
+
+uint64_t puzzle_19_1(std::ifstream &in_file)
+{
+	std::unordered_map<std::string, Workflow> flows;
+	std::vector<Part>                         parts;
+
+	parse_input(in_file, flows, parts);
 
 	uint64_t accepted_ratings{0};
 
 	for (auto &p : parts)
 	{
-		std::string workflow_name = "in";
+		// Process workflow
+		std::string workflow_name = START;
 		int         rule_index    = 0;
 
-		while (workflow_name != "A" && workflow_name != "R")
+		while (workflow_name != ACCEPTED && workflow_name != REJECTED)
 		{
-			// std::cout << workflow_name << " -> ";
 			auto &rule = flows[workflow_name][rule_index];
 
 			if (rule.comparison > 0)
@@ -213,39 +222,132 @@ uint64_t puzzle_19_1(std::ifstream &in_file)
 			}
 		}
 
-		if ("A" == workflow_name)
+		if (ACCEPTED == workflow_name)
 		{
-			// std::cout << "Accepted" << std::endl;
 			accepted_ratings += p.x + p.m + p.a + p.s;
 		}
-		else
-		{
-			// std::cout << "Rejected" << std::endl;
-		}
-
-		// std::cout << std::endl;
 	}
 
 	return accepted_ratings;
 }
 
-uint64_t puzzle_19_2(std::ifstream &in_file)
+struct Range
 {
-	std::string line;
+	uint32_t min{};
+	uint32_t max{};
+};
 
-	while (std::getline(in_file, line))
+void split_ranges(std::unordered_map<std::string, Workflow> &flows, std::string next, std::unordered_map<Category, Range> &ranges, uint64_t &accepted_combinations)
+{
+	if (next == REJECTED)
 	{
-		if (line.size() > 0)
-		{
-			std::cout << line << std::endl;
-		}
+		// Workflow end, not accepted
+		return;
 	}
 
-	return 0;
+	if (next == ACCEPTED)
+	{
+		// Workflow end, calculate all
+		// combinations that are accepted
+		uint64_t prod{1};
+		for (auto &cat : ranges)
+		{
+			auto &range = cat.second;
+			if (range.max < range.min)
+			{
+				std::cout << "Error" << std::endl;
+				return;
+			}
+
+			prod *= (range.max - range.min + 1);
+		}
+
+		// Add to the total
+		accepted_combinations += prod;
+
+		return;
+	}
+
+	// Process workflow
+	auto &workflow = flows[next];
+	for (auto &rule : workflow)
+	{
+		if (0 == rule.comparison)
+		{
+			// Last rule of this workflow
+			split_ranges(flows, rule.destination, ranges, accepted_combinations);
+			return;
+		}
+
+		if (rule.greater_than)
+		{
+			auto greater_ranges = ranges;
+
+			auto &range = ranges[rule.cat];
+
+			// For values in the range that pass this rule, calculate
+			// how many will be accepted
+			if (range.max > rule.comparison)
+			{
+				greater_ranges[rule.cat] = {std::max(range.min, rule.comparison + 1), range.max};
+			}
+			split_ranges(flows, rule.destination, greater_ranges, accepted_combinations);
+
+			// For those that fail, continue processing rules in this workflow
+			if (range.min <= rule.comparison)
+			{
+				ranges[rule.cat] = {range.min, std::min(range.max, rule.comparison)};
+			}
+		}
+		else
+		{
+			auto lower_ranges = ranges;
+
+			auto &range = ranges[rule.cat];
+
+			// For values in the range that pass this rule, calculate
+			// how many will be accepted
+			if (range.min < rule.comparison)
+			{
+				lower_ranges[rule.cat] = {range.min, std::min(range.max, rule.comparison - 1)};
+			}
+			split_ranges(flows, rule.destination, lower_ranges, accepted_combinations);
+
+			// For those that fail, continue processing rules in this workflow
+			if (range.max >= rule.comparison)
+			{
+				ranges[rule.cat] = {std::max(range.min, rule.comparison), range.max};
+			}
+		}
+	}
+}
+
+uint64_t puzzle_19_2(std::ifstream &in_file)
+{
+	std::unordered_map<std::string, Workflow> flows;
+	std::vector<Part>                         parts;
+
+	parse_input(in_file, flows, parts);
+
+	// Ignore input parts, use ranges of possible inputs
+	constexpr int MIN = 1;
+	constexpr int MAX = 4000;
+
+	std::unordered_map<Category, Range> ranges;
+	ranges[Category::X] = {MIN, MAX};
+	ranges[Category::M] = {MIN, MAX};
+	ranges[Category::A] = {MIN, MAX};
+	ranges[Category::S] = {MIN, MAX};
+
+	uint64_t accepted_combinations{0};
+
+	split_ranges(flows, START, ranges, accepted_combinations);
+
+	return accepted_combinations;
 }
 }        // namespace
 
 uint64_t puzzle_19(std::ifstream &in_file)
 {
-	return puzzle_19_1(in_file);
+	return puzzle_19_2(in_file);
 }
