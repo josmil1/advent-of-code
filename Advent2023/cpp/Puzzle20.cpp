@@ -40,14 +40,12 @@ uint64_t lcm_vector(std::vector<uint64_t> v)
 	return result;
 }
 
-const std::string BROADCASTER = "broadcaster";
-
 enum class ModuleType
 {
 	BC   = 0,
 	FF   = 1,
 	Conj = 2,
-	Test = 3,
+	Out  = 3,
 };
 
 struct Pulse
@@ -59,24 +57,23 @@ struct Pulse
 
 using PulseList = std::deque<Pulse>;
 
+void send_pulse(Pulse pulse, PulseList &pulse_list);
+
 class Module
 {
   public:
 	virtual ModuleType get_type() = 0;
 
-	inline void set_name(std::string n)
-	{
-		name = n;
-	}
+	virtual void process_pulse(Pulse &pulse, PulseList &pulse_list) = 0;
 
 	inline std::string get_name()
 	{
 		return name;
 	}
 
-	void add_output(std::string name)
+	inline void set_name(std::string n)
 	{
-		outputs.push_back(name);
+		name = n;
 	}
 
 	inline std::vector<std::string> get_outputs()
@@ -84,42 +81,17 @@ class Module
 		return outputs;
 	}
 
-	/*
-	    void receive(Pulse &pulse)
-	    {
-	        last_pulse_high = pulse.high;
-	    }
-	*/
-
-	virtual void process_pulse(Pulse &pulse, PulseList &pulse_list) = 0;
+	void add_output(std::string name)
+	{
+		outputs.push_back(name);
+	}
 
   protected:
-	// bool last_pulse_high{false};
-
 	std::string name{};
 
   private:
 	std::vector<std::string> outputs;
 };
-
-std::unordered_map<std::string, Module *> modules;
-
-uint64_t low_count{0};
-uint64_t high_count{0};
-
-void send_pulse(Pulse pulse, PulseList &pulse_list)
-{
-	if (pulse.high)
-	{
-		high_count++;
-	}
-	else
-	{
-		low_count++;
-	}
-
-	pulse_list.push_back(pulse);
-}
 
 class Broadcaster : public Module
 {
@@ -134,6 +106,7 @@ class Broadcaster : public Module
 		for (auto &out : get_outputs())
 		{
 			// std::cout << "Broadcaster sends " << pulse.high << " to " << out << std::endl;
+
 			send_pulse({name, out, pulse.high}, pulse_list);
 		}
 	}
@@ -147,13 +120,6 @@ class FlipFlop : public Module
 		return ModuleType::FF;
 	}
 
-	/*
-	void receive(bool high_pulse) override
-	{
-	    Module::receive(high_pulse);
-	}
-	*/
-
 	void process_pulse(Pulse &pulse, PulseList &pulse_list) override
 	{
 		if (!pulse.high)
@@ -163,6 +129,7 @@ class FlipFlop : public Module
 			for (auto &out : get_outputs())
 			{
 				// std::cout << "FlipFlop " << name << " sends " << state << " to " << out << std::endl;
+
 				send_pulse({name, out, state}, pulse_list);
 			}
 		}
@@ -195,20 +162,19 @@ class Conjuction : public Module
 		for (auto &out : get_outputs())
 		{
 			// std::cout << "Conjuction " << name << " sends " << !all_high << " to " << out << std::endl;
+
 			send_pulse({name, out, !all_high}, pulse_list);
-
-			pulse_count++;
 		}
-	}
-
-	inline void add_input(std::string in)
-	{
-		inputs[in] = false;
 	}
 
 	inline std::unordered_map<std::string, bool> get_inputs()
 	{
 		return inputs;
+	}
+
+	inline void add_input(std::string in)
+	{
+		inputs[in] = false;
 	}
 
 	inline uint64_t get_cycle()
@@ -231,29 +197,52 @@ class Conjuction : public Module
 
 	uint64_t cycle{0};
 
-	uint64_t pulse_count{0};
-
 	bool sent_high{false};
 };
 
-class TestModule : public Module
+class OutputModule : public Module
 {
   public:
 	ModuleType get_type() override
 	{
-		return ModuleType::Test;
+		return ModuleType::Out;
 	}
 
 	void process_pulse(Pulse &pulse, PulseList &pulse_list) override
 	{
-		// std::cout << "TestModule " << name << " does nothing" << std::endl;
+		// std::cout << "OutputModule " << name << " does nothing" << std::endl;
 	}
 };
 
-std::unordered_map<std::string, bool> visited;
+// Globals and helper functions
+const std::string BROADCASTER = "broadcaster";
+const std::string TARGET      = "output";        // "rx" in the real puzzle input
 
-void get_parents(std::string &name, std::set<std::string> &parents, std::unordered_map<std::string, std::vector<std::string>> &inputs)
+bool PART_TWO{false};
+
+std::unordered_map<std::string, Module *> modules;
+
+uint64_t low_count{0};
+uint64_t high_count{0};
+
+void send_pulse(Pulse pulse, PulseList &pulse_list)
 {
+	if (pulse.high)
+	{
+		high_count++;
+	}
+	else
+	{
+		low_count++;
+	}
+
+	pulse_list.push_back(pulse);
+}
+
+void get_conj_parents(std::string &name, std::set<std::string> &parents, std::unordered_map<std::string, std::vector<std::string>> &inputs)
+{
+	static std::unordered_map<std::string, bool> visited;
+
 	if (inputs.count(name))
 	{
 		if (!visited.count(name) || !visited[name])
@@ -265,7 +254,7 @@ void get_parents(std::string &name, std::set<std::string> &parents, std::unorder
 				if (modules[in]->get_type() == ModuleType::Conj)
 				{
 					parents.insert(in);
-					get_parents(in, parents, inputs);
+					get_conj_parents(in, parents, inputs);
 				}
 			}
 		}
@@ -274,10 +263,10 @@ void get_parents(std::string &name, std::set<std::string> &parents, std::unorder
 
 uint64_t puzzle_20_1(std::ifstream &in_file)
 {
-	std::string line;
-
 	std::unordered_map<std::string, std::vector<std::string>> inputs;
 
+	// Parse modules
+	std::string line;
 	while (std::getline(in_file, line))
 	{
 		if (line.size() > 0)
@@ -319,10 +308,9 @@ uint64_t puzzle_20_1(std::ifstream &in_file)
 				}
 			}
 
+			// Module outputs
 			module = modules[name];
 			module->set_name(name);
-
-			// Module inputs/outputs
 			while (!line.empty())
 			{
 				std::string output{};
@@ -340,10 +328,11 @@ uint64_t puzzle_20_1(std::ifstream &in_file)
 				}
 
 				module->add_output(output);
-				// inputs[module->get_name()].push_back(output);
+
 				inputs[output].push_back(module->get_name());
 			}
 
+			// Conjuction module inputs
 			if (module->get_type() == ModuleType::Conj)
 			{
 				auto *conj = dynamic_cast<Conjuction *>(module);
@@ -351,65 +340,38 @@ uint64_t puzzle_20_1(std::ifstream &in_file)
 				{
 					conj->add_input(in);
 				}
-
-				/*
-				    std::cout << name << std::endl;
-				    for (auto m : conj->get_inputs())
-				    {
-				        std::cout << "\t" << m << std::endl;
-				    }
-				*/
 			}
-
-			/*
-			std::cout << name << std::endl;
-			for (auto m : module->get_outputs())
-			{
-			    std::cout << "\t" << m << std::endl;
-			}
-			*/
 		}
 	}
 
-	// Add test modules
+	// Add output modules (modules with no outputs)
 	for (auto &in : inputs)
 	{
 		if (!modules.count(in.first))
 		{
-			modules.insert(std::make_pair(in.first, new TestModule()));
+			modules.insert(std::make_pair(in.first, new OutputModule()));
 			modules[in.first]->set_name(in.first);
 		}
 	}
 
-	// Find rx and all parents
+	// Part 2: Calculate size of repeating cycle for all
+	// ancestors above the target's parent (once the parent
+	// is set, the target will receive a low pulse, but
+	// this will take too many button presses)
 	std::set<std::string> parents;
-	// std::string           target = "output";
-	std::string target        = "rx";
-	std::string target_parent = inputs[target][0];
+	std::string           target_parent = inputs[TARGET][0];        // Assumes single parent
 
-	get_parents(target_parent, parents, inputs);
-
-	// for (auto &mod : modules)
-	//{
-	//	if (mod.second->get_type() == ModuleType::Conj)
-	//	{
-	//		parents.insert(mod.first);
-	//	}
-	// }
-
+	get_conj_parents(target_parent, parents, inputs);
 	parents.erase(target_parent);
 
-	// Broadcast pulses
-	// constexpr int BUTTON_PRESSES = 1000;
-
+	uint64_t pulse_prod{0};
 	uint64_t button_presses{0};
-
-	// for (int i = 0; i < BUTTON_PRESSES; i++)
-	bool stop{false};
+	bool     stop{false};
 	while (!stop)
 	{
 		button_presses++;
 
+		// Broadcast pulses
 		PulseList pulse_list;
 		send_pulse({"button", BROADCASTER, false}, pulse_list);
 
@@ -418,61 +380,61 @@ uint64_t puzzle_20_1(std::ifstream &in_file)
 			auto p = pulse_list.front();
 			pulse_list.pop_front();
 
-			// modules[p.name]->receive(p.high);
 			modules[p.to]->process_pulse(p, pulse_list);
 		}
 
-		// std::cout << high_count << " * " << low_count << std::endl;
-		stop = true;
-		for (auto &parent : parents)
+		if (!PART_TWO)
 		{
-			auto parent_mod = dynamic_cast<Conjuction *>(modules[parent]);
-			if (parent_mod->get_sent_high() && 0 == parent_mod->get_cycle())
+			// Part 1: interested in first thousand cycles
+			if (1000 == button_presses)
 			{
-				parent_mod->set_cycle(button_presses);
-			}
+				pulse_prod = high_count * low_count;
 
-			if (parent_mod->get_cycle() == 0)
-			{
-				// std::cout << "no cycle for " << parent << std::endl;
-				stop = false;
+				stop = true;
 			}
 		}
-		// std::cout << std::endl;
+		else
+		{
+			// Part 2: find cycles of ancestor conjuction nodes
+			stop = true;
+			for (auto &parent : parents)
+			{
+				auto parent_mod = dynamic_cast<Conjuction *>(modules[parent]);
+				if (parent_mod->get_sent_high() && 0 == parent_mod->get_cycle())
+				{
+					parent_mod->set_cycle(button_presses);
+				}
+
+				if (parent_mod->get_cycle() == 0)
+				{
+					stop = false;
+				}
+			}
+		}
 	}
 
+	// Find LCM of all ancestors' cycles, this will be the number of button presses
+	// required for all of them to send a high pulse to the target's parent,
+	// which will in turn deliver a low pulse to the target
 	std::vector<uint64_t> cycles;
-
 	for (auto &parent : parents)
 	{
 		auto cycle = dynamic_cast<Conjuction *>(modules[parent])->get_cycle();
 		cycles.push_back(cycle);
-		std::cout << modules[parent]->get_name() << " -> " << cycle << std::endl;
 	}
 
-	std::cout << button_presses << std::endl;
-
-	return lcm_vector(cycles);
-	// return low_count * high_count;
+	return PART_TWO ? lcm_vector(cycles) : pulse_prod;
 }
 
 uint64_t puzzle_20_2(std::ifstream &in_file)
 {
-	std::string line;
+	PART_TWO = true;
 
-	while (std::getline(in_file, line))
-	{
-		if (line.size() > 0)
-		{
-			std::cout << line << std::endl;
-		}
-	}
-
-	return 0;
+	return puzzle_20_1(in_file);
 }
 }        // namespace
 
 uint64_t puzzle_20(std::ifstream &in_file)
 {
-	return puzzle_20_1(in_file);
+	return puzzle_20_2(in_file);
 }
