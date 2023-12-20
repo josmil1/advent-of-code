@@ -1,9 +1,45 @@
 #include "Puzzles.hpp"
 
 #include <deque>
+#include <set>
 
+// Lowest common multiple functions from https://stackoverflow.com/a/4229930
 namespace
 {
+uint64_t gcd(uint64_t a, uint64_t b)
+{
+	while (true)
+	{
+		if (0 == a)
+		{
+			return b;
+		}
+
+		b %= a;
+
+		if (0 == b)
+		{
+			return a;
+		}
+
+		a %= b;
+	}
+}
+
+uint64_t lcm(uint64_t a, uint64_t b)
+{
+	uint64_t temp = gcd(a, b);
+
+	return temp ? (a / temp * b) : 0;
+}
+
+uint64_t lcm_vector(std::vector<uint64_t> v)
+{
+	uint64_t result = std::accumulate(v.begin(), v.end(), 1ULL, lcm);
+
+	return result;
+}
+
 const std::string BROADCASTER = "broadcaster";
 
 enum class ModuleType
@@ -151,10 +187,17 @@ class Conjuction : public Module
 		auto all_high = std::accumulate(inputs.begin(), inputs.end(), true,
 		                                [](bool value, const std::unordered_map<std::string, bool>::value_type &p) { return value & p.second; });
 
+		if (!all_high)
+		{
+			sent_high = true;
+		}
+
 		for (auto &out : get_outputs())
 		{
 			// std::cout << "Conjuction " << name << " sends " << !all_high << " to " << out << std::endl;
 			send_pulse({name, out, !all_high}, pulse_list);
+
+			pulse_count++;
 		}
 	}
 
@@ -168,8 +211,29 @@ class Conjuction : public Module
 		return inputs;
 	}
 
+	inline uint64_t get_cycle()
+	{
+		return cycle;
+	}
+
+	void set_cycle(uint64_t c)
+	{
+		cycle = c;
+	}
+
+	inline bool get_sent_high()
+	{
+		return sent_high;
+	}
+
   private:
 	std::unordered_map<std::string, bool> inputs;
+
+	uint64_t cycle{0};
+
+	uint64_t pulse_count{0};
+
+	bool sent_high{false};
 };
 
 class TestModule : public Module
@@ -186,8 +250,29 @@ class TestModule : public Module
 	}
 };
 
-uint64_t
-    puzzle_20_1(std::ifstream &in_file)
+std::unordered_map<std::string, bool> visited;
+
+void get_parents(std::string &name, std::set<std::string> &parents, std::unordered_map<std::string, std::vector<std::string>> &inputs)
+{
+	if (inputs.count(name))
+	{
+		if (!visited.count(name) || !visited[name])
+		{
+			visited[name] = true;
+
+			for (auto &in : inputs[name])
+			{
+				if (modules[in]->get_type() == ModuleType::Conj)
+				{
+					parents.insert(in);
+					get_parents(in, parents, inputs);
+				}
+			}
+		}
+	}
+}
+
+uint64_t puzzle_20_1(std::ifstream &in_file)
 {
 	std::string line;
 
@@ -296,11 +381,35 @@ uint64_t
 		}
 	}
 
-	// Broadcast pulses
-	constexpr int BUTTON_PRESSES = 1000;
+	// Find rx and all parents
+	std::set<std::string> parents;
+	// std::string           target = "output";
+	std::string target        = "rx";
+	std::string target_parent = inputs[target][0];
 
-	for (int i = 0; i < BUTTON_PRESSES; i++)
+	get_parents(target_parent, parents, inputs);
+
+	// for (auto &mod : modules)
+	//{
+	//	if (mod.second->get_type() == ModuleType::Conj)
+	//	{
+	//		parents.insert(mod.first);
+	//	}
+	// }
+
+	parents.erase(target_parent);
+
+	// Broadcast pulses
+	// constexpr int BUTTON_PRESSES = 1000;
+
+	uint64_t button_presses{0};
+
+	// for (int i = 0; i < BUTTON_PRESSES; i++)
+	bool stop{false};
+	while (!stop)
 	{
+		button_presses++;
+
 		PulseList pulse_list;
 		send_pulse({"button", BROADCASTER, false}, pulse_list);
 
@@ -314,9 +423,37 @@ uint64_t
 		}
 
 		// std::cout << high_count << " * " << low_count << std::endl;
+		stop = true;
+		for (auto &parent : parents)
+		{
+			auto parent_mod = dynamic_cast<Conjuction *>(modules[parent]);
+			if (parent_mod->get_sent_high() && 0 == parent_mod->get_cycle())
+			{
+				parent_mod->set_cycle(button_presses);
+			}
+
+			if (parent_mod->get_cycle() == 0)
+			{
+				// std::cout << "no cycle for " << parent << std::endl;
+				stop = false;
+			}
+		}
+		// std::cout << std::endl;
 	}
 
-	return low_count * high_count;
+	std::vector<uint64_t> cycles;
+
+	for (auto &parent : parents)
+	{
+		auto cycle = dynamic_cast<Conjuction *>(modules[parent])->get_cycle();
+		cycles.push_back(cycle);
+		std::cout << modules[parent]->get_name() << " -> " << cycle << std::endl;
+	}
+
+	std::cout << button_presses << std::endl;
+
+	return lcm_vector(cycles);
+	// return low_count * high_count;
 }
 
 uint64_t puzzle_20_2(std::ifstream &in_file)
