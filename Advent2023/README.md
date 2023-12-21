@@ -8,4 +8,8 @@ https://adventofcode.com/2023
 
 ## Day 20
 
-* Inheritance
+* [Inheritance](https://en.wikipedia.org/wiki/Inheritance_(object-oriented_programming))
+
+## Day 21
+
+* [Breadth-first search](https://en.wikipedia.org/wiki/Breadth-first_search)
