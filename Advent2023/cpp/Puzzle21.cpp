@@ -1,13 +1,14 @@
 #include "Puzzles.hpp"
 
 #include <deque>
+#include <set>
 
 namespace
 {
 struct Pos
 {
-	int32_t x{0};
-	int32_t y{0};
+	int64_t x{0};
+	int64_t y{0};
 
 	Pos operator+(const Pos &other) const
 	{
@@ -20,15 +21,20 @@ struct Pos
 		return x == other.x &&
 		       y == other.y;
 	}
+
+	bool operator<(const Pos &other) const
+	{
+		return x == other.x ? y < other.y : x < other.x;
+	}
 };
 
-using Grid = std::unordered_map<uint64_t, uint32_t>;
+using Grid = std::unordered_map<uint64_t, int64_t>;
 
 struct Garden
 {
 	Grid    grid;
-	int32_t width;
-	int32_t height;
+	int64_t width;
+	int64_t height;
 };
 
 inline uint64_t key(int32_t x, int32_t y)
@@ -184,19 +190,78 @@ uint64_t puzzle_21_1(std::ifstream &in_file)
 	return final_positions.size();
 }
 
+int64_t mod(int64_t a, int64_t b)
+{
+	return (a % b + b) % b;
+}
+
 uint64_t puzzle_21_2(std::ifstream &in_file)
 {
 	auto garden = parse_garden(in_file);
 
 	Pos start = {garden.width / 2, garden.height / 2};
 
-	std::cout << garden.width << " x " << garden.height << std::endl;
+	std::set<Pos> final_positions;
 
-	return 0;
+	// constexpr int STEPS = 65 + 262;        // 94315
+	//  constexpr int STEPS = 65 + 131;        // 33976
+	constexpr int STEPS = 65;        // 3787
+
+	// BFS
+	std::unordered_map<PlotState, bool, PlotStateHasher> visited;
+
+	std::deque<PlotState> positions;
+	positions.push_back({start, 0});
+
+	while (!positions.empty())
+	{
+		auto cur      = positions.front().pos;
+		auto distance = positions.front().distance;
+		positions.pop_front();
+
+		if (visited.count({cur, distance}) && visited[{cur, distance}])
+		{
+			continue;
+		}
+
+		visited[{cur, distance}] = true;
+
+		if (STEPS == distance)
+		{
+			final_positions.insert(cur);
+		}
+		else
+		{
+			for (int i = -1; i <= 1; i++)
+			{
+				for (int j = -1; j <= 1; j++)
+				{
+					if ((i == 0 && j == 0) || (std::abs(i) == std::abs(j)))
+					{
+						// Orthogonal only, and not-self
+						continue;
+					}
+
+					auto new_pos = cur + Pos{i, j};
+
+					if (garden.grid.count(key(mod(new_pos.x, garden.width), mod(new_pos.y, garden.width))))
+					{
+						// Within bounds, and not a rock: visit neighbors
+						positions.push_back({new_pos, distance + 1});
+					}
+				}
+			}
+		}
+	}
+
+	return final_positions.size();
+	// Fit polynomial: https://www.wolframalpha.com/input?i=quadratic+fit+calculator&assumption=%7B%22F%22%2C+%22QuadraticFitCalculator%22%2C+%22data3x%22%7D+-%3E%22%7B0%2C1%2C2%7D%22&assumption=%7B%22F%22%2C+%22QuadraticFitCalculator%22%2C+%22data3y%22%7D+-%3E%22%7B3787%2C+33976%2C+94315%7D%22
+	// Resolve: https://www.wolframalpha.com/input?i=3787+%2B+15114+x+%2B+15075+x%5E2%2C+x+%3D+202300
+	// Answer: 616951804315987
 }
 }        // namespace
 
 uint64_t puzzle_21(std::ifstream &in_file)
 {
-	return puzzle_21_1(in_file);
+	return puzzle_21_2(in_file);
 }
