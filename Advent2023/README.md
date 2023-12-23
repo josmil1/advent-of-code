@@ -16,3 +16,6 @@ https://adventofcode.com/2023
 ## Day 21
 
 * [Breadth-first search](https://en.wikipedia.org/wiki/Breadth-first_search)
+
+## Day 23
+* [Depth-first search](https://en.wikipedia.org/wiki/Depth-first_search)
