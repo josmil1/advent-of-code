@@ -19,3 +19,6 @@ https://adventofcode.com/2023
 
 ## Day 23
 * [Depth-first search](https://en.wikipedia.org/wiki/Depth-first_search)
+
+## Day 25
+* [Karger's Algorithm](https://en.wikipedia.org/wiki/Karger%27s_algorithm)
