@@ -19,7 +19,6 @@ uint64_t puzzle_25_1(std::ifstream &in_file)
 	std::unordered_map<std::string, bool> connections_helper;
 
 	std::string line;
-
 	std::string str;
 
 	while (std::getline(in_file, line))
@@ -75,115 +74,64 @@ uint64_t puzzle_25_1(std::ifstream &in_file)
 	std::vector<std::set<std::string>> groups;
 
 	bool cut_three{false};
-
-	uint32_t safe{0};
-
 	while (!cut_three)
 	{
-		safe++;
-		if (safe > 1000000000)
-			break;
-
+		// Initialize 1 group per component
 		groups.clear();
-
 		for (auto &comp : components)
 		{
 			groups.push_back({comp});
 		}
 
+		// Randomly contract connections until all components are in one of exactly 2 groups
 		std::set<std::string> group_1, group_2;
-
-		// std::cout << "Groups " << groups.size() << std::endl;
-
-		uint32_t safe_count{0};
-
 		while (groups.size() > 2)
 		{
-			safe_count++;
-			if (safe_count > 1000000000)
-				break;
-
 			auto rand_i = dist(rng);
-
-			// std::cout << connections[rand_i].a << " <-> " << connections[rand_i].b << std::endl;
 
 			auto it_1 = std::find_if(groups.begin(), groups.end(),
 			                         [&](std::set<std::string> &group) { return group.count(connections[rand_i].a); });
 			auto it_2 = std::find_if(groups.begin(), groups.end(),
 			                         [&](std::set<std::string> &group) { return group.count(connections[rand_i].b); });
 
-			// std::cout << "it1 " << it_1->size() << " it2 " << it_2->size() << std::endl;
-
 			if (it_1 == it_2)
 			{
+				// Both components are in the same group
 				continue;
 			}
 
-			// std::cout << "it_1" << std::endl;
-			for (auto &s : *it_1)
-			{
-				// std::cout << "\t" << s << std::endl;
-			}
-			// std::cout << "it_2" << std::endl;
-			for (auto &s : *it_2)
-			{
-				// std::cout << "\t" << s << std::endl;
-			}
-
+			// Merge the groups
 			it_1->insert(it_2->begin(), it_2->end());
-
-			// std::cout << "After insert it_1" << std::endl;
-			for (auto &s : *it_1)
-			{
-				// std::cout << "\t" << s << std::endl;
-			}
-
 			groups.erase(it_2);
 		}
 
-		// std::cout << "check wires" << std::endl;
-
+		// Check that these two groups were the result of cutting exactly 3 wires
 		uint32_t cut_wires{0};
 		for (int i = 0; i < connections.size(); ++i)
 		{
-			auto left  = std::find_if(groups.begin(), groups.end(),
-			                          [&](std::set<std::string> &group) { return group.count(connections[i].a); });
-			auto right = std::find_if(groups.begin(), groups.end(),
-			                          [&](std::set<std::string> &group) { return group.count(connections[i].b); });
+			auto it_1 = std::find_if(groups.begin(), groups.end(),
+			                         [&](std::set<std::string> &group) { return group.count(connections[i].a); });
+			auto it_2 = std::find_if(groups.begin(), groups.end(),
+			                         [&](std::set<std::string> &group) { return group.count(connections[i].b); });
 
-			if (left != right)
+			if (it_1 != it_2)
 			{
-				// std::cout << "\t" << connections[i].a << " and " << connections[i].b << " are in different groups, wire cut" << std::endl;
+				// Components are now in different groups, this connection (wire) was cut
 				cut_wires++;
 			}
 		}
 
-		// std::cout << cut_wires << std::endl;
-
-		if (3 == cut_wires)
-		{
-			cut_three = true;
-		}
+		cut_three = (3 == cut_wires);
 	}
 
-	std::cout << cut_three << ": " << groups.size() << std::endl;
-
+	// Return product of the 2 group sizes
 	return std::accumulate(groups.begin(), groups.end(), 1,
 	                       [](uint64_t p, const std::vector<std::set<std::string>>::value_type &g) { return p * g.size(); });
 }
 
 uint64_t puzzle_25_2(std::ifstream &in_file)
 {
-	std::string line;
-
-	while (std::getline(in_file, line))
-	{
-		if (line.size() > 0)
-		{
-			std::cout << line << std::endl;
-		}
-	}
-
+	// No Part 2, Merry Christmas!
 	return 0;
 }
 }        // namespace
