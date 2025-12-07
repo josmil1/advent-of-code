@@ -2,11 +2,13 @@ Advent2021/.vscode/*
 Advent2022/.vscode/*
 Advent2023/.vscode/*
 Advent2024/.vscode/*
+Advent2025/.vscode/*
 
 Advent2021/cpp/placeholders/*
 Advent2022/cpp/template.cpp
 Advent2023/old/*
 Advent2024/old/*
+Advent2025/old/*
 
 *.xcodeproj/*
 *.pch
